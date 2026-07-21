@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}{{ inf.name }} · 시딩 퍼널{% endblock %}
+{% block body %}
+<div class="crumb"><a href="/">← 대시보드</a></div>
+<h1>{{ inf.name }} <span class="chip">{{ inf.tier }}</span></h1>
+<p class="sub">@{{ inf.handle }} · {{ inf.category }} · 팔로워 {{ inf.follower_count|won }}</p>
+
+<h2>콘텐츠별 퍼널</h2>
+{% for c in contents %}
+<div class="content-block">
+  <div class="content-head">
+    <span class="pn">{{ c.product_name }}</span>
+    <span class="chip">{{ c.platform }}</span>
+    {% if c.coupon_code %}<span class="mono">{{ c.coupon_code }}</span>{% endif %}
+  </div>
+
+  {% if c.has_link %}
+  <div class="funnel">
+    {% set fvars = ['--f1','--f2','--f3','--f4','--f5'] %}
+    {% for st in c.steps %}
+    <div class="frow">
+      <div class="fl">{{ st.label }}</div>
+      <div class="fbar-track">
+        <div class="fbar" style="width: {{ st.width|round(1) }}%; background: var({{ fvars[loop.index0] }});">
+          {{ st.count|won }}
+        </div>
+      </div>
+      <div class="fmeta {{ 'worst' if st.is_worst else '' }}">
+        {% if st.drop is not none %}{% if st.is_worst %}⚠ 최대이탈 {% endif %}이탈 {{ st.drop|pct(0) }}{% else %}시작{% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  <p class="legend">단계 폭 = 클릭 대비 잔존 세션 비율. 이탈%는 직전 단계 대비 감소율.</p>
+  {% else %}
+  <div class="couponcard">
+    <div><div class="label" style="color:var(--text-secondary);font-size:12px">쿠폰 사용 주문</div><b>{{ c.orders }}</b></div>
+    <div><div class="label" style="color:var(--text-secondary);font-size:12px">쿠폰 매출</div><b>{{ c.revenue|won }} 원</b></div>
+  </div>
+  <p class="legend">링크를 걸 수 없는 채널({{ c.platform }})이라 중간 퍼널은 관측 불가 — 쿠폰코드로 구매만 집계합니다.</p>
+  {% endif %}
+</div>
+{% endfor %}
+{% endblock %}

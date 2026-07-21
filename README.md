@@ -10,6 +10,30 @@
 - [MVP 스펙](docs/mvp-spec.md) — 데이터 모델, 퍼널·지표 정의, MVP 기능/화면, 열린 결정 사항
 - [기획서](docs/기획서.md) — 배경·문제정의·시장·차별점 원안
 
+## MVP 실행
+
+```bash
+pip install -r requirements.txt
+python scripts/seed.py            # 샘플 데이터 생성 (cosmetic.db)
+uvicorn app.main:app --reload     # http://127.0.0.1:8000
+```
+
+- `/` — 인플루언서 비교 대시보드 (클릭·구매·CVR·쿠폰 매출·AOV)
+- `/influencer/{id}` — 콘텐츠별 퍼널 드릴다운 (링크 트랙은 단계별 이탈, 쿠폰 트랙은 구매 요약)
+- `POST /api/issue` — 콘텐츠별 쿠폰코드 + UTM 링크 발급
+- `GET /r/{content_id}` — 클릭 로깅 후 랜딩으로 302 리다이렉트
+
+### 구조
+```
+app/
+  db.py          스키마 · 연결 (SQLite, PostgreSQL 호환 지향)
+  metrics.py     어트리뷰션 규칙 + 퍼널 집계
+  main.py        FastAPI 라우트 (대시보드 · 발급기 · 리다이렉트)
+  templates/     서버렌더 화면
+  static/        대시보드 스타일 (라이트/다크)
+scripts/seed.py  샘플 데이터 생성기
+```
+
 ## 로드맵
 1. **MVP**: 쿠폰/링크 발급기 + 클릭·쿠폰 트래킹 + 인플루언서 비교 대시보드 ← 현재
 2. 이벤트 수집 파이프라인 + 자사몰 GA4 연동
