@@ -78,6 +78,30 @@ class _HttpEmbedding(EmbeddingBackend):
         return [d["embedding"] for d in data]
 
 
+class LocalEmbedding(EmbeddingBackend):
+    """로컬 sentence-transformers 다국어 모델. 키·과금 없이 진짜 의미 매칭.
+
+    첫 호출 시 모델을 로드(최초 1회 다운로드). 모델은 환경변수 LOCAL_EMBED_MODEL
+    로 교체 가능(기본: 다국어 MiniLM).
+    """
+    name = "local"
+    default_model = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+
+    def __init__(self, model=None):
+        self.model_name = model or os.environ.get("LOCAL_EMBED_MODEL", self.default_model)
+        self._model = None
+
+    def _load(self):
+        if self._model is None:
+            from sentence_transformers import SentenceTransformer
+            self._model = SentenceTransformer(self.model_name)
+        return self._model
+
+    def embed(self, texts):
+        m = self._load()
+        return m.encode(list(texts), normalize_embeddings=True).tolist()
+
+
 class OpenAIEmbedding(_HttpEmbedding):
     name = "openai"
     url = "https://api.openai.com/v1/embeddings"
@@ -92,17 +116,31 @@ class VoyageEmbedding(_HttpEmbedding):
     env_key = "VOYAGE_API_KEY"
 
 
-_BACKENDS = {b.name: b for b in (HashingEmbedding, OpenAIEmbedding, VoyageEmbedding)}
+_BACKENDS = {b.name: b for b in
+             (HashingEmbedding, LocalEmbedding, OpenAIEmbedding, VoyageEmbedding)}
+
+
+def _local_available():
+    try:
+        import sentence_transformers  # noqa: F401
+        return True
+    except Exception:
+        return False
 
 
 def make_backend(name=None):
-    """환경변수 EMBEDDING_BACKEND 또는 키 존재 여부로 자동 선택."""
+    """환경변수 EMBEDDING_BACKEND 또는 키/설치 여부로 자동 선택.
+
+    우선순위: 명시 지정 > OpenAI 키 > Voyage 키 > 로컬 모델 설치됨 > hashing 폴백.
+    """
     name = name or os.environ.get("EMBEDDING_BACKEND")
     if not name:
         if os.environ.get("OPENAI_API_KEY"):
             name = "openai"
         elif os.environ.get("VOYAGE_API_KEY"):
             name = "voyage"
+        elif _local_available():
+            name = "local"
         else:
             name = "hashing"
     return _BACKENDS[name]()

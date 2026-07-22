@@ -1,0 +1,6 @@
+# 로컬 임베딩 백엔드(키·과금 없이 의미 매칭)용 추가 의존성.
+# 무겁습니다(torch 등). API 백엔드(openai/voyage)만 쓸 거면 설치 불필요.
+#   pip install -r requirements-local.txt
+#   (CPU 전용 torch: pip install torch --index-url https://download.pytorch.org/whl/cpu)
+torch
+sentence-transformers
