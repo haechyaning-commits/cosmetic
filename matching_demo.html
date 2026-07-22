@@ -70,7 +70,34 @@ h1{font-size:24px;letter-spacing:-.02em;margin:0 0 6px;text-wrap:balance}
 .t-sem{background:var(--sem-soft)}.f-sem{background:var(--sem)}.t-eng{background:var(--eng-soft)}.f-eng{background:var(--eng)}.t-aud{background:var(--aud-soft)}.f-aud{background:var(--aud)}
 .legend{font-size:11.5px;color:var(--muted);margin-top:14px}
 footer{margin-top:26px;color:var(--muted);font-size:12px;text-align:center}
-@media (max-width:760px){.card{grid-template-columns:26px 1fr;gap:10px}.scores{grid-column:1/-1}.finalscore{justify-content:flex-start}.app{padding:26px 15px 60px}}
+.viewtabs{display:flex;gap:6px;margin:4px 0 14px}
+.cmp-head{display:grid;grid-template-columns:1fr 130px 1fr;align-items:center;font-weight:650;font-size:13px;margin-bottom:8px}
+.cmp-head .r{text-align:right}
+.tagm{font-size:11px;font-weight:500;color:var(--muted);border:1px solid var(--line-strong);border-radius:999px;padding:1px 7px;margin-left:5px}
+.tagm.accent{color:var(--accent);border-color:var(--accent)}
+.cmp-body{position:relative;display:grid;grid-template-columns:1fr 130px 1fr;background:var(--surface);border:1px solid var(--border);border-radius:13px;box-shadow:var(--shadow);overflow:hidden}
+.cmp-col{display:flex;flex-direction:column}
+.cmp-row{height:52px;display:flex;align-items:center;gap:9px;padding:0 14px;border-bottom:1px solid var(--line)}
+.cmp-row:last-child{border-bottom:none}
+.cmp-col.right .cmp-row{flex-direction:row-reverse}
+.cmp-rk{font-weight:700;color:var(--muted);min-width:18px;text-align:center;font-variant-numeric:tabular-nums}
+.cmp-nm{font-weight:600;display:flex;align-items:center;gap:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cmp-col.right .cmp-nm{flex-direction:row-reverse}
+.cmp-mid{position:relative;border-left:1px solid var(--line);border-right:1px solid var(--line)}
+.cmp-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.cmp-svg .ln{fill:none;stroke-width:2;vector-effect:non-scaling-stroke;opacity:.6}
+.cmp-svg .ln.up{stroke:var(--aud);opacity:.85}
+.cmp-svg .ln.down{stroke:var(--eng);opacity:.85}
+.cmp-svg .ln.same{stroke:var(--line-strong)}
+.delta{font-size:11.5px;font-weight:700;font-variant-numeric:tabular-nums;padding:0 2px}
+.delta.up{color:var(--aud)}.delta.down{color:var(--eng)}.delta.same{color:var(--muted)}
+.cmp-row.up{background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--aud) 9%,transparent))}
+.cmp-row.down{background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--eng) 9%,transparent))}
+.cmp-col.right .cmp-row.up,.cmp-col.right .cmp-row.down{background:linear-gradient(270deg,transparent,color-mix(in srgb,var(--aud) 9%,transparent))}
+.cmp-col.right .cmp-row.down{background:linear-gradient(270deg,transparent,color-mix(in srgb,var(--eng) 9%,transparent))}
+.cmp-excluded{margin-top:12px;font-size:12px;color:var(--critical)}
+@media (max-width:760px){.card{grid-template-columns:26px 1fr;gap:10px}.scores{grid-column:1/-1}.finalscore{justify-content:flex-start}.app{padding:26px 15px 60px}
+  .cmp-head,.cmp-body{grid-template-columns:1fr 54px 1fr}.cmp-row{padding:0 8px;gap:5px;font-size:12px}.badge{display:none}}
 </style>
 
 <div class="app">
@@ -99,8 +126,16 @@ footer{margin-top:26px;color:var(--muted);font-size:12px;text-align:center}
     <label class="toggle"><input type="checkbox" id="semtoggle" checked>의미 매칭 사용 <span style="color:var(--muted)">(끄면 기존 툴 방식=정형만)</span></label>
   </div>
 
+  <div class="viewtabs">
+    <button class="btn" data-view="rank" aria-pressed="true">랭킹</button>
+    <button class="btn" data-view="compare" aria-pressed="false">정형 vs 의미 비교</button>
+  </div>
+
   <div class="rank" id="rank"></div>
-  <p class="legend">최종점수 = w1·의미 + w2·참여율 + w3·오디언스핏 (가중치 합 1로 정규화). 정형 필터 제외 후보는 회색으로 하단. 매칭 근거는 상품과 의미가 가장 가까운 인플루언서 콘텐츠/키워드입니다. · 의미 매칭을 끄면 메이크업 인플루언서가 콜라겐 상품 상위로 뜨는 등 기존 툴의 한계가 드러납니다.</p>
+  <p class="legend" id="rank-legend">최종점수 = w1·의미 + w2·참여율 + w3·오디언스핏 (가중치 합 1로 정규화). 정형 필터 제외 후보는 회색으로 하단. 매칭 근거는 상품과 의미가 가장 가까운 인플루언서 콘텐츠/키워드입니다. · 의미 매칭을 끄면 메이크업 인플루언서가 콜라겐 상품 상위로 뜨는 등 기존 툴의 한계가 드러납니다.</p>
+
+  <div id="compare" style="display:none"></div>
+
   <footer>인플루언서-제품 매칭 스코어링 — MVP 데모</footer>
 </div>
 
@@ -115,7 +150,7 @@ const won=n=>Number(n).toLocaleString("en-US");
 function renderProducts(){
   $("products").innerHTML=DATA.products.map((p,i)=>`<div class="pcard ${i===pidx?'sel':''}" data-i="${i}">
     <div class="pn">${p.product.name}</div><div class="pc">${p.product.category}</div></div>`).join("");
-  document.querySelectorAll(".pcard").forEach(c=>c.onclick=()=>{pidx=+c.dataset.i;renderProducts();renderProd();render();});
+  document.querySelectorAll(".pcard").forEach(c=>c.onclick=()=>{pidx=+c.dataset.i;renderProducts();renderProd();refresh();});
 }
 function renderProd(){
   const p=DATA.products[pidx].product;
@@ -142,9 +177,51 @@ function render(){
       <div class="sub">@${r.handle} · 팔로워 ${won(r.follower_count)} · 참여율 ${(r.engagement_rate*100).toFixed(1)}%</div>${reasons}${excl}</div>${sub}</div>`;
   }).join("");
 }
-function setPreset(name){W={...PRESETS[name]};document.querySelectorAll(".presets .btn").forEach(b=>b.setAttribute("aria-pressed",b.dataset.preset===name));setSliders();render();}
+// ---- 정형 vs 의미 비교(슬로프 차트) ----
+let view="rank";
+function structFinal(r){const s=W.w2+W.w3;return s?(W.w2*r.engagement+W.w3*r.audience_fit)/s:0;}
+function semFinal(r){return W.w1*r.semantic+W.w2*r.engagement+W.w3*r.audience_fit;}
+function deltaHtml(d){if(d>0)return `<span class="delta up">▲${d}</span>`;if(d<0)return `<span class="delta down">▼${-d}</span>`;return `<span class="delta same">–</span>`;}
+function renderCompare(){
+  const rowH=52;
+  const all=DATA.products[pidx].rows;
+  const rows=all.filter(r=>!r.excluded), ex=all.filter(r=>r.excluded);
+  const byStruct=[...rows].sort((a,b)=>structFinal(b)-structFinal(a));
+  const bySem=[...rows].sort((a,b)=>semFinal(b)-semFinal(a));
+  const sr=new Map(byStruct.map((r,i)=>[r.influencer_id,i]));
+  const mr=new Map(bySem.map((r,i)=>[r.influencer_id,i]));
+  const H=rows.length*rowH;
+  const dirOf=r=>{const d=sr.get(r.influencer_id)-mr.get(r.influencer_id);return d>0?"up":d<0?"down":"same";};
+  const leftRows=byStruct.map((r,i)=>`<div class="cmp-row ${dirOf(r)}"><span class="cmp-rk">${i+1}</span><span class="cmp-nm">${r.name}<span class="badge niche">${r.niche_category}</span></span></div>`).join("");
+  const rightRows=bySem.map((r,i)=>{const d=sr.get(r.influencer_id)-i;return `<div class="cmp-row ${dirOf(r)}"><span class="cmp-rk">${i+1}</span><span class="cmp-nm">${r.name}<span class="badge niche">${r.niche_category}</span></span>${deltaHtml(d)}</div>`;}).join("");
+  const lines=rows.map(r=>{const yL=sr.get(r.influencer_id)*rowH+rowH/2, yR=mr.get(r.influencer_id)*rowH+rowH/2;
+    return `<path class="ln ${dirOf(r)}" d="M0 ${yL} C 50 ${yL}, 50 ${yR}, 100 ${yR}"/>`;}).join("");
+  const exHtml=ex.length?`<div class="cmp-excluded">⛔ 정형 필터 제외: ${ex.map(r=>r.name+" ("+r.filter_reasons.join(", ")+")").join(" · ")}</div>`:"";
+  $("compare").innerHTML=`
+    <div class="cmp-head"><div>정형 필터만 <span class="tagm">기존 툴 방식</span></div><div></div><div class="r">의미 매칭 추가 <span class="tagm accent">본 프로젝트</span></div></div>
+    <div class="cmp-body" style="height:${H}px">
+      <div class="cmp-col left">${leftRows}</div>
+      <div class="cmp-mid"><svg class="cmp-svg" viewBox="0 0 100 ${H}" preserveAspectRatio="none">${lines}</svg></div>
+      <div class="cmp-col right">${rightRows}</div>
+    </div>
+    ${exHtml}
+    <p class="legend">같은 인플루언서를 두 방식에서 연결. <b style="color:var(--aud)">위로 뛴 선(▲)</b> = 의미 매칭으로 새로 발굴된 인접 니치, <b style="color:var(--eng)">아래로 내린 선(▼)</b> = 정형 신호(참여·팔로워)만으론 과대평가됐던 후보. 현재 가중치 슬라이더 값을 반영합니다.</p>`;
+}
+function refresh(){
+  const rankOn=view==="rank";
+  $("rank").style.display=rankOn?"":"none";
+  $("rank-legend").style.display=rankOn?"":"none";
+  $("compare").style.display=rankOn?"none":"";
+  if(rankOn)render(); else renderCompare();
+}
+document.querySelectorAll(".viewtabs .btn").forEach(b=>b.onclick=()=>{
+  view=b.dataset.view;
+  document.querySelectorAll(".viewtabs .btn").forEach(x=>x.setAttribute("aria-pressed",x.dataset.view===view));
+  refresh();
+});
+function setPreset(name){W={...PRESETS[name]};document.querySelectorAll(".presets .btn").forEach(b=>b.setAttribute("aria-pressed",b.dataset.preset===name));setSliders();refresh();}
 document.querySelectorAll(".presets .btn").forEach(b=>b.onclick=()=>setPreset(b.dataset.preset));
-["w1","w2","w3"].forEach(id=>$(id).addEventListener("input",()=>{document.querySelectorAll(".presets .btn").forEach(b=>b.setAttribute("aria-pressed","false"));readSliders();render();}));
-$("semtoggle").addEventListener("change",e=>{useSem=e.target.checked;render();});
-renderProducts();renderProd();setSliders();render();
+["w1","w2","w3"].forEach(id=>$(id).addEventListener("input",()=>{document.querySelectorAll(".presets .btn").forEach(b=>b.setAttribute("aria-pressed","false"));readSliders();refresh();}));
+$("semtoggle").addEventListener("change",e=>{useSem=e.target.checked;refresh();});
+renderProducts();renderProd();setSliders();refresh();
 </script>
