@@ -1,0 +1,150 @@
+<style>
+:root{color-scheme:light;
+ --page:#f7f7f4;--surface:#fdfdfc;--surface-2:#f1f1ed;--ink:#111110;--ink-2:#55544f;--muted:#8b8983;
+ --line:#e6e5de;--line-strong:#d3d2c9;--border:rgba(17,17,16,.08);--accent:#2a78d6;
+ --sem:#2a78d6;--sem-soft:#cde2fb;--eng:#eb6834;--eng-soft:#fbdccd;--aud:#1baf7a;--aud-soft:#c3ede0;--critical:#d03b3b;
+ --shadow:0 1px 2px rgba(17,17,16,.05),0 8px 24px -16px rgba(17,17,16,.18);}
+@media (prefers-color-scheme:dark){:root:where(:not([data-theme="light"])){color-scheme:dark;
+ --page:#0e0e0d;--surface:#191917;--surface-2:#201f1d;--ink:#f6f5f0;--ink-2:#c2c1b8;--muted:#8b8983;
+ --line:#2a2926;--line-strong:#373631;--border:rgba(246,245,240,.10);--accent:#3987e5;
+ --sem:#3987e5;--sem-soft:#173a63;--eng:#d95926;--eng-soft:#48210f;--aud:#199e70;--aud-soft:#0e3a2a;--critical:#e06060;
+ --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 30px -18px rgba(0,0,0,.7);}}
+:root[data-theme="dark"]{color-scheme:dark;
+ --page:#0e0e0d;--surface:#191917;--surface-2:#201f1d;--ink:#f6f5f0;--ink-2:#c2c1b8;--muted:#8b8983;
+ --line:#2a2926;--line-strong:#373631;--border:rgba(246,245,240,.10);--accent:#3987e5;
+ --sem:#3987e5;--sem-soft:#173a63;--eng:#d95926;--eng-soft:#48210f;--aud:#199e70;--aud-soft:#0e3a2a;--critical:#e06060;
+ --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 30px -18px rgba(0,0,0,.7);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.app{max-width:1060px;margin:0 auto;padding:38px 24px 80px}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:650;margin:0 0 8px}
+h1{font-size:24px;letter-spacing:-.02em;margin:0 0 6px;text-wrap:balance}
+.lede{color:var(--ink-2);margin:0;max-width:64ch}
+.backend-chip{display:inline-flex;gap:7px;align-items:center;font-size:12px;color:var(--muted);background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:4px 11px;margin-top:12px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--eng);flex:none}
+.section-label{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:26px 0 9px;font-weight:650}
+.products{display:flex;gap:9px;flex-wrap:wrap}
+.pcard{cursor:pointer;border:1px solid var(--line-strong);background:var(--surface);border-radius:11px;padding:11px 15px;min-width:150px;transition:.12s}
+.pcard:hover{border-color:var(--accent)}
+.pcard.sel{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.pcard .pn{font-weight:650;color:var(--ink)}
+.pcard .pc{font-size:12px;color:var(--muted);margin-top:2px}
+.prodbox{margin:20px 0 4px;padding:16px 18px;background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow)}
+.prodbox h2{margin:0 0 6px;font-size:17px}
+.prodbox .meta{color:var(--ink-2);font-size:13px}
+.prodbox .kv{margin-top:8px;font-size:13px;color:var(--ink-2);display:grid;gap:3px}
+.prodbox .kv b{color:var(--ink);font-weight:600}
+.controls{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-end;margin:22px 0 14px;padding:15px 18px;background:var(--surface-2);border:1px solid var(--border);border-radius:12px}
+.presets{display:flex;gap:7px}
+.btn{font-size:12.5px;padding:6px 12px;border-radius:8px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink-2);cursor:pointer;transition:.12s}
+.btn:hover{border-color:var(--accent);color:var(--ink)}
+.btn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.sliders{display:flex;gap:16px;flex-wrap:wrap}
+.slider{display:flex;flex-direction:column;gap:4px;min-width:140px}
+.slider .lab{font-size:12px;color:var(--ink-2);display:flex;justify-content:space-between;gap:10px}
+.slider .lab .sw{display:inline-flex;align-items:center;gap:6px}
+.swatch{width:9px;height:9px;border-radius:2px;display:inline-block}
+.slider input[type=range]{width:100%;accent-color:var(--accent)}
+.slider .val{font-variant-numeric:tabular-nums;font-weight:600;color:var(--ink)}
+.toggle{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2);cursor:pointer;user-select:none}
+.toggle input{width:16px;height:16px;accent-color:var(--accent)}
+.rank{display:grid;gap:10px;margin-top:6px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:14px 16px;box-shadow:var(--shadow);display:grid;grid-template-columns:34px 1fr 200px;gap:14px;align-items:center;transition:.15s}
+.card.excluded{opacity:.6}
+.rankno{font-size:17px;font-weight:700;color:var(--muted);text-align:center;font-variant-numeric:tabular-nums}
+.who{min-width:0}
+.who .nm{font-weight:660;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.badge{font-size:10.5px;padding:1px 7px;border-radius:999px;border:1px solid var(--line-strong);color:var(--ink-2)}
+.badge.niche{background:var(--surface-2)}
+.who .sub{font-size:12px;color:var(--muted);margin-top:1px}
+.reasons{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.rchip{font-size:11.5px;padding:2px 9px;border-radius:999px;background:var(--sem-soft);color:var(--ink);border:1px solid var(--border)}
+.excl{font-size:12px;color:var(--critical);font-weight:600;margin-top:7px;display:flex;align-items:center;gap:6px}
+.scores{display:grid;gap:7px}
+.finalscore{display:flex;align-items:baseline;gap:6px;justify-content:flex-end}
+.finalscore .fs{font-size:22px;font-weight:720;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.finalscore .fl{font-size:11px;color:var(--muted)}
+.subbar{display:grid;grid-template-columns:34px 1fr 34px;gap:7px;align-items:center;font-size:11px}
+.subbar .sl{color:var(--ink-2)}.subbar .sv{text-align:right;font-variant-numeric:tabular-nums;color:var(--ink-2)}
+.track{height:6px;border-radius:999px;overflow:hidden}.track>span{display:block;height:100%;border-radius:999px}
+.t-sem{background:var(--sem-soft)}.f-sem{background:var(--sem)}.t-eng{background:var(--eng-soft)}.f-eng{background:var(--eng)}.t-aud{background:var(--aud-soft)}.f-aud{background:var(--aud)}
+.legend{font-size:11.5px;color:var(--muted);margin-top:14px}
+footer{margin-top:26px;color:var(--muted);font-size:12px;text-align:center}
+@media (max-width:760px){.card{grid-template-columns:26px 1fr;gap:10px}.scores{grid-column:1/-1}.finalscore{justify-content:flex-start}.app{padding:26px 15px 60px}}
+</style>
+
+<div class="app">
+  <p class="eyebrow">인플루언서 · 제품 매칭 스코어링</p>
+  <h1>이 상품에 누구를 시딩해야 맞을까</h1>
+  <p class="lede">정형 필터로 후보를 거른 뒤, 콘텐츠 텍스트의 <b>의미 유사도</b>로 순위화합니다. 카테고리 라벨이 달라도 의미가 겹치는 인접 니치 인플루언서를 찾아냅니다.</p>
+  <span class="backend-chip"><span class="dot"></span>데모: 오프라인 폴백(hashing) 임베딩으로 계산된 샘플 — 실서비스는 OpenAI/Voyage API 백엔드로 의미 매칭 정확도↑</span>
+
+  <div class="section-label">상품 선택</div>
+  <div class="products" id="products"></div>
+  <div class="prodbox" id="prodbox"></div>
+
+  <div class="controls">
+    <div>
+      <div class="section-label" style="margin:0 0 7px">캠페인 프리셋</div>
+      <div class="presets">
+        <button class="btn" data-preset="conversion" aria-pressed="true">전환형 (콘텐츠↑)</button>
+        <button class="btn" data-preset="awareness">인지도형 (참여율↑)</button>
+      </div>
+    </div>
+    <div class="sliders">
+      <div class="slider"><div class="lab"><span class="sw"><span class="swatch" style="background:var(--sem)"></span>의미 적합성 w1</span><span class="val" id="v1"></span></div><input type="range" id="w1" min="0" max="100" step="5"></div>
+      <div class="slider"><div class="lab"><span class="sw"><span class="swatch" style="background:var(--eng)"></span>참여율 w2</span><span class="val" id="v2"></span></div><input type="range" id="w2" min="0" max="100" step="5"></div>
+      <div class="slider"><div class="lab"><span class="sw"><span class="swatch" style="background:var(--aud)"></span>오디언스핏 w3</span><span class="val" id="v3"></span></div><input type="range" id="w3" min="0" max="100" step="5"></div>
+    </div>
+    <label class="toggle"><input type="checkbox" id="semtoggle" checked>의미 매칭 사용 <span style="color:var(--muted)">(끄면 기존 툴 방식=정형만)</span></label>
+  </div>
+
+  <div class="rank" id="rank"></div>
+  <p class="legend">최종점수 = w1·의미 + w2·참여율 + w3·오디언스핏 (가중치 합 1로 정규화). 정형 필터 제외 후보는 회색으로 하단. 매칭 근거는 상품과 의미가 가장 가까운 인플루언서 콘텐츠/키워드입니다. · 의미 매칭을 끄면 메이크업 인플루언서가 콜라겐 상품 상위로 뜨는 등 기존 툴의 한계가 드러납니다.</p>
+  <footer>인플루언서-제품 매칭 스코어링 — MVP 데모</footer>
+</div>
+
+<script type="application/json" id="DATA">{"backend": "hashing", "presets": {"conversion": {"w1": 0.6, "w2": 0.2, "w3": 0.2}, "awareness": {"w1": 0.3, "w2": 0.5, "w3": 0.2}}, "default": {"w1": 0.6, "w2": 0.2, "w3": 0.2}, "products": [{"product": {"product_id": 1, "name": "이너글로우 콜라겐 파우더", "category": "건강/이너뷰티", "price": 39000, "ingredients": "저분자 피쉬 콜라겐, 비타민C, 엘라스틴", "efficacy_description": "피부 탄력 개선, 수분 유지, 속당김 완화에 도움을 주는 먹는 이너뷰티", "usage_scenario": "아침 공복 물에 타먹는 이너뷰티 루틴, 안티에이징 관리", "target_age_group": "25-45", "target_gender": "F", "competitor_brands": "뉴트리원"}, "rows": [{"influencer_id": 2, "name": "한지우", "handle": "jiwoo.innerbeauty", "tier": "mid", "niche_category": "건강", "follower_count": 88000, "engagement_rate": 0.052, "semantic": 0.8362, "engagement": 0.5385, "audience_fit": 0.875, "final": 0.7844, "excluded": false, "filter_reasons": [], "reasons": ["이너뷰티", "이너뷰티는 먹는 것부터", "저분자 콜라겐 파우더로 피부 탄력 챙기는 중"]}, {"influencer_id": 1, "name": "윤채원", "handle": "chaewon.skin", "tier": "micro", "niche_category": "스킨케어", "follower_count": 42000, "engagement_rate": 0.061, "semantic": 0.712, "engagement": 0.7692, "audience_fit": 0.79, "final": 0.7391, "excluded": false, "filter_reasons": [], "reasons": ["이너뷰티 루틴", "요즘 피부 탄력이 부쩍 떨어져서 콜라겐 관리 시작했어요", "피부 탄력"]}, {"influencer_id": 6, "name": "정민서", "handle": "minseo.care", "tier": "micro", "niche_category": "스킨케어", "follower_count": 27000, "engagement_rate": 0.066, "semantic": 0.6037, "engagement": 0.8974, "audience_fit": 0.63, "final": 0.6677, "excluded": false, "filter_reasons": [], "reasons": ["수분", "속당김 완화", "저자극 루틴"]}, {"influencer_id": 4, "name": "이서아", "handle": "seoa.makeup", "tier": "micro", "niche_category": "메이크업", "follower_count": 61000, "engagement_rate": 0.07, "semantic": 0.533, "engagement": 1.0, "audience_fit": 0.5341, "final": 0.6266, "excluded": false, "filter_reasons": [], "reasons": ["색조", "지속력 좋은 색조 추천", "매트한 립 틴트 발색 비교"]}, {"influencer_id": 8, "name": "서지호", "handle": "jiho.daddy", "tier": "mid", "niche_category": "육아", "follower_count": 140000, "engagement_rate": 0.044, "semantic": 0.54, "engagement": 0.3333, "audience_fit": 0.7, "final": 0.5307, "excluded": false, "filter_reasons": [], "reasons": ["살림", "두 아이 육아 브이로그", "아기 스킨케어 꿀템"]}, {"influencer_id": 5, "name": "최유나", "handle": "yuna.beauty", "tier": "mega", "niche_category": "뷰티", "follower_count": 320000, "engagement_rate": 0.031, "semantic": 0.6152, "engagement": 0.0, "audience_fit": 0.705, "final": 0.5101, "excluded": false, "filter_reasons": [], "reasons": ["스킨케어부터 메이크업까지 종합 뷰티", "수분", "수분 앰플 후기"]}, {"influencer_id": 3, "name": "박도현", "handle": "dohyun.fit", "tier": "mid", "niche_category": "건강", "follower_count": 210000, "engagement_rate": 0.048, "semantic": 0.5809, "engagement": 0.4359, "audience_fit": 0.355, "final": 0.5067, "excluded": false, "filter_reasons": [], "reasons": ["유산소 루틴", "운동 루틴", "단백질"]}, {"influencer_id": 7, "name": "강하린", "handle": "harin.glow", "tier": "micro", "niche_category": "스킨케어", "follower_count": 51000, "engagement_rate": 0.058, "semantic": 0.6696, "engagement": 0.6923, "audience_fit": 0.7425, "final": 0.6888, "excluded": true, "filter_reasons": ["경쟁 브랜드 협찬 이력(뉴트리원)"], "reasons": ["콜라겐", "피부 탄력", "탄탄한 피부 루틴"]}]}, {"product": {"product_id": 2, "name": "수분광 진정 앰플", "category": "스킨케어", "price": 28000, "ingredients": "히알루론산, 판테놀, 마데카소사이드", "efficacy_description": "건조한 피부 속당김 완화, 진정, 수분 장벽 강화", "usage_scenario": "건조한 겨울철 저녁 스킨케어 마지막 단계, 저자극 진정 루틴", "target_age_group": "20-39", "target_gender": "F", "competitor_brands": "라운드랩"}, "rows": [{"influencer_id": 6, "name": "정민서", "handle": "minseo.care", "tier": "micro", "niche_category": "스킨케어", "follower_count": 27000, "engagement_rate": 0.066, "semantic": 0.8621, "engagement": 0.8974, "audience_fit": 0.8184, "final": 0.8605, "excluded": false, "filter_reasons": [], "reasons": ["수분 진정 앰플", "진정", "속당김 완화"]}, {"influencer_id": 1, "name": "윤채원", "handle": "chaewon.skin", "tier": "micro", "niche_category": "스킨케어", "follower_count": 42000, "engagement_rate": 0.061, "semantic": 0.6852, "engagement": 0.7692, "audience_fit": 0.8084, "final": 0.7267, "excluded": false, "filter_reasons": [], "reasons": ["속당김 완화", "나이보다 어려보이는 피부 루틴 공유", "속당김 없는 촉촉한 마무리 앰플 추천"]}, {"influencer_id": 4, "name": "이서아", "handle": "seoa.makeup", "tier": "micro", "niche_category": "메이크업", "follower_count": 61000, "engagement_rate": 0.07, "semantic": 0.5271, "engagement": 1.0, "audience_fit": 0.6743, "final": 0.6511, "excluded": false, "filter_reasons": [], "reasons": ["발색", "매트한 립 틴트 발색 비교", "립 틴트"]}, {"influencer_id": 7, "name": "강하린", "handle": "harin.glow", "tier": "micro", "niche_category": "스킨케어", "follower_count": 51000, "engagement_rate": 0.058, "semantic": 0.6297, "engagement": 0.6923, "audience_fit": 0.5852, "final": 0.6333, "excluded": false, "filter_reasons": [], "reasons": ["탄탄한 피부 루틴", "피부 탄력", "안티에이징"]}, {"influencer_id": 5, "name": "최유나", "handle": "yuna.beauty", "tier": "mega", "niche_category": "뷰티", "follower_count": 320000, "engagement_rate": 0.031, "semantic": 0.6794, "engagement": 0.0, "audience_fit": 0.925, "final": 0.5926, "excluded": false, "filter_reasons": [], "reasons": ["스킨케어", "수분", "수분 앰플 후기"]}, {"influencer_id": 2, "name": "한지우", "handle": "jiwoo.innerbeauty", "tier": "mid", "niche_category": "건강", "follower_count": 88000, "engagement_rate": 0.052, "semantic": 0.5697, "engagement": 0.5385, "audience_fit": 0.6917, "final": 0.5879, "excluded": false, "filter_reasons": [], "reasons": ["영양제 루틴", "피부 탄력", "저분자 콜라겐 파우더로 피부 탄력 챙기는 중"]}, {"influencer_id": 3, "name": "박도현", "handle": "dohyun.fit", "tier": "mid", "niche_category": "건강", "follower_count": 210000, "engagement_rate": 0.048, "semantic": 0.5415, "engagement": 0.4359, "audience_fit": 0.5434, "final": 0.5208, "excluded": false, "filter_reasons": [], "reasons": ["유산소 루틴", "운동 루틴", "단백질"]}, {"influencer_id": 8, "name": "서지호", "handle": "jiho.daddy", "tier": "mid", "niche_category": "육아", "follower_count": 140000, "engagement_rate": 0.044, "semantic": 0.5534, "engagement": 0.3333, "audience_fit": 0.5375, "final": 0.5062, "excluded": false, "filter_reasons": [], "reasons": ["아기 스킨케어 꿀템", "두 아이 육아 브이로그", "육아"]}]}, {"product": {"product_id": 3, "name": "벨벳 매트 립 틴트", "category": "메이크업", "price": 19000, "ingredients": "호호바 오일, 비타민E 코팅 피그먼트", "efficacy_description": "매트하지만 촉촉한 발색, 하루 종일 지속되는 색조", "usage_scenario": "데일리 메이크업 포인트, 지속력 필요한 색조 룩", "target_age_group": "18-32", "target_gender": "F", "competitor_brands": "롬앤"}, "rows": [{"influencer_id": 4, "name": "이서아", "handle": "seoa.makeup", "tier": "micro", "niche_category": "메이크업", "follower_count": 61000, "engagement_rate": 0.07, "semantic": 0.821, "engagement": 1.0, "audience_fit": 0.8529, "final": 0.8632, "excluded": false, "filter_reasons": [], "reasons": ["데일리 메이크업", "색조", "매트한 립 틴트 발색 비교"]}, {"influencer_id": 6, "name": "정민서", "handle": "minseo.care", "tier": "micro", "niche_category": "스킨케어", "follower_count": 27000, "engagement_rate": 0.066, "semantic": 0.5451, "engagement": 0.8974, "audience_fit": 0.825, "final": 0.6715, "excluded": false, "filter_reasons": [], "reasons": ["히알루론산", "수분 진정 앰플", "히알루론산 성분 좋아함"]}, {"influencer_id": 1, "name": "윤채원", "handle": "chaewon.skin", "tier": "micro", "niche_category": "스킨케어", "follower_count": 42000, "engagement_rate": 0.061, "semantic": 0.5488, "engagement": 0.7692, "audience_fit": 0.6067, "final": 0.6044, "excluded": false, "filter_reasons": [], "reasons": ["속당김 없는 촉촉한 마무리 앰플 추천", "나이보다 어려보이는 피부 루틴 공유", "촉촉함"]}, {"influencer_id": 7, "name": "강하린", "handle": "harin.glow", "tier": "micro", "niche_category": "스킨케어", "follower_count": 51000, "engagement_rate": 0.058, "semantic": 0.5342, "engagement": 0.6923, "audience_fit": 0.4623, "final": 0.5515, "excluded": false, "filter_reasons": [], "reasons": ["콜라겐 앰플 꾸준히 사용 후기", "탄탄한 피부 루틴", "피부 탄력"]}, {"influencer_id": 3, "name": "박도현", "handle": "dohyun.fit", "tier": "mid", "niche_category": "건강", "follower_count": 210000, "engagement_rate": 0.048, "semantic": 0.5863, "engagement": 0.4359, "audience_fit": 0.55, "final": 0.549, "excluded": false, "filter_reasons": [], "reasons": ["운동 루틴", "오늘도 헬스장 직진", "벌크업"]}, {"influencer_id": 2, "name": "한지우", "handle": "jiwoo.innerbeauty", "tier": "mid", "niche_category": "건강", "follower_count": 88000, "engagement_rate": 0.052, "semantic": 0.5161, "engagement": 0.5385, "audience_fit": 0.5346, "final": 0.5243, "excluded": false, "filter_reasons": [], "reasons": ["이너뷰티는 먹는 것부터", "콜라겐", "이너뷰티"]}, {"influencer_id": 5, "name": "최유나", "handle": "yuna.beauty", "tier": "mega", "niche_category": "뷰티", "follower_count": 320000, "engagement_rate": 0.031, "semantic": 0.5661, "engagement": 0.0, "audience_fit": 0.7107, "final": 0.4818, "excluded": false, "filter_reasons": [], "reasons": ["앰플", "스킨케어부터 메이크업까지 종합 뷰티", "수분 앰플 후기"]}, {"influencer_id": 8, "name": "서지호", "handle": "jiho.daddy", "tier": "mid", "niche_category": "육아", "follower_count": 140000, "engagement_rate": 0.044, "semantic": 0.5427, "engagement": 0.3333, "audience_fit": 0.3885, "final": 0.47, "excluded": false, "filter_reasons": [], "reasons": ["두 아이 육아 브이로그", "육아", "가족 나들이"]}]}]}</script>
+<script>
+const DATA=JSON.parse(document.getElementById("DATA").textContent);
+const PRESETS=DATA.presets;
+let W={...DATA.default}, useSem=true, pidx=0;
+const $=id=>document.getElementById(id), pctOf=x=>Math.round(x*100);
+const won=n=>Number(n).toLocaleString("en-US");
+
+function renderProducts(){
+  $("products").innerHTML=DATA.products.map((p,i)=>`<div class="pcard ${i===pidx?'sel':''}" data-i="${i}">
+    <div class="pn">${p.product.name}</div><div class="pc">${p.product.category}</div></div>`).join("");
+  document.querySelectorAll(".pcard").forEach(c=>c.onclick=()=>{pidx=+c.dataset.i;renderProducts();renderProd();render();});
+}
+function renderProd(){
+  const p=DATA.products[pidx].product;
+  $("prodbox").innerHTML=`<h2>${p.name}</h2>
+    <div class="meta">${p.category} · ${won(p.price)}원 · 타겟 ${p.target_age_group} / ${p.target_gender}</div>
+    <div class="kv"><div><b>성분</b> ${p.ingredients}</div><div><b>효능</b> ${p.efficacy_description}</div><div><b>사용</b> ${p.usage_scenario}</div></div>`;
+}
+function setSliders(){$("w1").value=Math.round(W.w1*100);$("w2").value=Math.round(W.w2*100);$("w3").value=Math.round(W.w3*100);
+  $("v1").textContent=pctOf(W.w1)+"%";$("v2").textContent=pctOf(W.w2)+"%";$("v3").textContent=pctOf(W.w3)+"%";}
+function readSliders(){let a=+$("w1").value,b=+$("w2").value,c=+$("w3").value,s=a+b+c;if(s===0){a=b=c=1;s=3;}W={w1:a/s,w2:b/s,w3:c/s};setSliders();}
+function finalOf(r){if(useSem)return W.w1*r.semantic+W.w2*r.engagement+W.w3*r.audience_fit;const s=W.w2+W.w3;return s?(W.w2*r.engagement+W.w3*r.audience_fit)/s:0;}
+function subbar(l,cls,v){return `<div class="subbar"><span class="sl">${l}</span><span class="track t-${cls}"><span class="f-${cls}" style="width:${(v*100).toFixed(0)}%"></span></span><span class="sv">${(v*100).toFixed(0)}</span></div>`;}
+function render(){
+  const rows=DATA.products[pidx].rows.map(r=>({...r,_f:r.excluded?-1:finalOf(r)}));
+  rows.sort((a,b)=>(a.excluded-b.excluded)||(b._f-a._f));
+  let n=0;
+  $("rank").innerHTML=rows.map(r=>{
+    if(!r.excluded)n++;
+    const reasons=(useSem&&!r.excluded&&r.reasons.length)?`<div class="reasons">${r.reasons.map(x=>`<span class="rchip">${x}</span>`).join("")}</div>`:"";
+    const excl=r.excluded?`<div class="excl">⛔ 정형 필터 제외 — ${r.filter_reasons.join(", ")}</div>`:"";
+    const sub=r.excluded?"":`<div class="scores"><div class="finalscore"><span class="fs">${(r._f*100).toFixed(0)}</span><span class="fl">/ 100</span></div>${useSem?subbar("의미","sem",r.semantic):""}${subbar("참여","eng",r.engagement)}${subbar("타겟","aud",r.audience_fit)}</div>`;
+    return `<div class="card ${r.excluded?'excluded':''}"><div class="rankno">${r.excluded?'—':n}</div>
+      <div class="who"><div class="nm">${r.name}<span class="badge niche">${r.niche_category}</span><span class="badge">${r.tier}</span></div>
+      <div class="sub">@${r.handle} · 팔로워 ${won(r.follower_count)} · 참여율 ${(r.engagement_rate*100).toFixed(1)}%</div>${reasons}${excl}</div>${sub}</div>`;
+  }).join("");
+}
+function setPreset(name){W={...PRESETS[name]};document.querySelectorAll(".presets .btn").forEach(b=>b.setAttribute("aria-pressed",b.dataset.preset===name));setSliders();render();}
+document.querySelectorAll(".presets .btn").forEach(b=>b.onclick=()=>setPreset(b.dataset.preset));
+["w1","w2","w3"].forEach(id=>$(id).addEventListener("input",()=>{document.querySelectorAll(".presets .btn").forEach(b=>b.setAttribute("aria-pressed","false"));readSliders();render();}));
+$("semtoggle").addEventListener("change",e=>{useSem=e.target.checked;render();});
+renderProducts();renderProd();setSliders();render();
+</script>
