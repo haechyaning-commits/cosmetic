@@ -1,0 +1,283 @@
+<style>
+:root{
+  color-scheme: light;
+  --page:#f7f7f4; --surface:#fdfdfc; --surface-2:#f2f2ee;
+  --ink:#111110; --ink-2:#55544f; --muted:#8b8983;
+  --line:#e6e5de; --line-strong:#d3d2c9;
+  --accent:#2a78d6; --accent-soft:#cde2fb;
+  --f1:#86b6ef; --f2:#5598e7; --f3:#2a78d6; --f4:#1c5cab; --f5:#104281;
+  --critical:#d03b3b; --good:#0a8f0a;
+  --border:rgba(17,17,16,.08);
+  --shadow:0 1px 2px rgba(17,17,16,.05),0 8px 24px -16px rgba(17,17,16,.18);
+}
+@media (prefers-color-scheme: dark){
+  :root:where(:not([data-theme="light"])){
+    color-scheme: dark;
+    --page:#0e0e0d; --surface:#191917; --surface-2:#201f1d;
+    --ink:#f6f5f0; --ink-2:#c2c1b8; --muted:#8b8983;
+    --line:#2a2926; --line-strong:#373631;
+    --accent:#3987e5; --accent-soft:#173a63;
+    --f1:#6da7ec; --f2:#3987e5; --f3:#256abf; --f4:#184f95; --f5:#0f3a72;
+    --critical:#e06060; --good:#25b025;
+    --border:rgba(246,245,240,.10);
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 30px -18px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --page:#0e0e0d; --surface:#191917; --surface-2:#201f1d;
+  --ink:#f6f5f0; --ink-2:#c2c1b8; --muted:#8b8983;
+  --line:#2a2926; --line-strong:#373631;
+  --accent:#3987e5; --accent-soft:#173a63;
+  --f1:#6da7ec; --f2:#3987e5; --f3:#256abf; --f4:#184f95; --f5:#0f3a72;
+  --critical:#e06060; --good:#25b025;
+  --border:rgba(246,245,240,.10);
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 30px -18px rgba(0,0,0,.7);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);
+  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;font-size:14px;line-height:1.5;
+  -webkit-font-smoothing:antialiased}
+.app{max-width:1080px;margin:0 auto;padding:40px 24px 80px}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:650;margin:0 0 8px}
+h1{font-size:26px;letter-spacing:-.02em;margin:0 0 6px;text-wrap:balance}
+.lede{color:var(--ink-2);margin:0;max-width:60ch}
+.demo-note{margin:14px 0 0;font-size:12.5px;color:var(--muted);display:inline-flex;gap:7px;align-items:center;
+  background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:5px 12px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--accent);flex:none}
+
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:28px 0 8px}
+.tile{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:15px 16px;box-shadow:var(--shadow)}
+.tile .k{color:var(--ink-2);font-size:12px}
+.tile .v{font-size:25px;font-weight:680;letter-spacing:-.02em;margin-top:5px;font-variant-numeric:tabular-nums}
+.tile .v small{font-size:13px;font-weight:500;color:var(--muted)}
+
+.bar-h{display:flex;align-items:baseline;justify-content:space-between;margin:34px 0 12px;gap:12px}
+.bar-h h2{font-size:15px;margin:0;letter-spacing:-.01em}
+.hint{font-size:11.5px;color:var(--muted)}
+.filters{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.fgroup{display:flex;gap:6px;align-items:center}
+.fgroup .lbl{font-size:11px;color:var(--muted);margin-right:2px}
+.chip{font-size:12px;padding:4px 11px;border-radius:999px;border:1px solid var(--line-strong);
+  background:var(--surface);color:var(--ink-2);cursor:pointer;transition:.12s;user-select:none;font-variant-numeric:tabular-nums}
+.chip:hover{border-color:var(--accent);color:var(--ink)}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:var(--shadow)}
+table{width:100%;border-collapse:collapse}
+th,td{padding:12px 15px;text-align:left;font-variant-numeric:tabular-nums}
+thead th{font-size:11px;color:var(--muted);font-weight:650;letter-spacing:.03em;text-transform:uppercase;
+  border-bottom:1px solid var(--line);background:var(--surface-2);cursor:pointer;white-space:nowrap}
+thead th.num,td.num{text-align:right}
+thead th .ar{opacity:.5;font-size:10px;margin-left:3px}
+tbody tr{border-bottom:1px solid var(--line);cursor:pointer;transition:background .12s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:var(--surface-2)}
+tbody tr.sel{background:var(--accent-soft)}
+.name{font-weight:600;color:var(--ink);display:flex;align-items:center;gap:8px}
+.name .go{color:var(--muted);font-size:12px;opacity:0;transition:.12s}
+tbody tr:hover .name .go{opacity:1}
+.tierchip{font-size:10.5px;padding:1px 7px;border-radius:999px;border:1px solid var(--line-strong);color:var(--ink-2)}
+.tier-mega{color:#b0682a;border-color:#e6c39a}
+.tier-mid{color:#2a78d6;border-color:#a9cbf0}
+.tier-micro{color:#0a8f0a;border-color:#a6d9a6}
+.barcell{display:flex;align-items:center;gap:9px;justify-content:flex-end}
+.cvr{min-width:48px;text-align:right;font-weight:650}
+.track{width:84px;height:7px;background:var(--accent-soft);border-radius:999px;overflow:hidden}
+.fill{height:100%;background:var(--accent);border-radius:999px}
+.na{color:var(--muted);font-size:12px}
+
+#panel{margin-top:20px}
+.detail{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px 22px 18px;box-shadow:var(--shadow);animation:rise .22s ease}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.detail{animation:none}}
+.dhead{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.dhead h3{margin:0;font-size:19px;letter-spacing:-.01em}
+.dmeta{color:var(--ink-2);font-size:13px;margin:4px 0 0}
+.dclose{margin-left:auto;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink-2);
+  border-radius:8px;padding:5px 11px;cursor:pointer;font-size:12px}
+.dclose:hover{color:var(--ink);border-color:var(--accent)}
+.cblock{margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+.cblock:first-of-type{border-top:none;padding-top:6px}
+.chead{display:flex;align-items:baseline;gap:9px;margin-bottom:12px;flex-wrap:wrap}
+.chead .pn{font-weight:650}
+.plat{font-size:11px;padding:1px 8px;border-radius:999px;border:1px solid var(--line-strong);color:var(--ink-2)}
+.code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;color:var(--muted)}
+.funnel{display:grid;gap:7px}
+.frow{display:grid;grid-template-columns:74px 1fr 132px;align-items:center;gap:11px}
+.frow .fl{color:var(--ink-2);font-size:13px;white-space:nowrap}
+.ftrack{background:var(--surface-2);border-radius:7px;height:27px;overflow:hidden}
+.fbar{height:100%;border-radius:7px;display:flex;align-items:center;padding-left:11px;color:#fff;
+  font-size:12px;font-weight:650;font-variant-numeric:tabular-nums;min-width:34px;transition:width .5s cubic-bezier(.3,.9,.3,1)}
+.fmeta{font-size:12px;color:var(--ink-2);text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.fmeta.worst{color:var(--critical);font-weight:700}
+.legend{font-size:11.5px;color:var(--muted);margin:9px 0 0}
+.couponcard{display:inline-flex;gap:26px;background:var(--surface-2);border-radius:10px;padding:13px 18px}
+.couponcard .k{font-size:11.5px;color:var(--ink-2)}
+.couponcard .b{font-size:19px;font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums}
+.empty{color:var(--muted);padding:30px;text-align:center}
+footer{margin-top:26px;color:var(--muted);font-size:12px;text-align:center}
+@media (max-width:720px){
+  .tiles{grid-template-columns:repeat(2,1fr)}
+  .app{padding:28px 16px 60px}
+  .track{width:56px}
+  th,td{padding:10px}
+  .hide-sm{display:none}
+  .frow{grid-template-columns:64px 1fr;grid-template-areas:"l bar" ". meta"}
+  .frow .fl{grid-area:l}.frow .ftrack{grid-area:bar}.frow .fmeta{grid-area:meta;text-align:left}
+}
+</style>
+
+<div class="app">
+  <p class="eyebrow">인플루언서 시딩 · 구매 퍼널</p>
+  <h1>시딩이 실제 구매로 얼마나 이어졌나</h1>
+  <p class="lede">유통 채널과 무관하게 자사가 집행한 인플루언서 시딩의 성과를 인플루언서·콘텐츠 단위로 비교하고, 어디서 이탈하는지 진단합니다.</p>
+  <p class="demo-note"><span class="dot"></span>샘플(더미) 데이터로 도구 동작을 시연하는 화면입니다 — 실데이터 아님</p>
+
+  <div class="tiles" id="tiles"></div>
+
+  <div class="bar-h">
+    <h2>인플루언서 비교</h2>
+    <span class="hint">행을 클릭하면 콘텐츠별 퍼널이 열립니다 · CVR = 구매 / 클릭</span>
+  </div>
+  <div class="filters" id="filters"></div>
+  <div class="card">
+    <table>
+      <thead><tr id="thead"></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+  <p class="legend">CVR 막대는 현재 표 내 최고값 기준 상대 길이. “쿠폰전용”은 릴스·쇼츠처럼 링크를 걸 수 없어 클릭이 없고 구매만 집계되는 콘텐츠입니다.</p>
+
+  <div id="panel"></div>
+
+  <footer>화장품 인플루언서 시딩 퍼널 분석 — MVP 데모</footer>
+</div>
+
+<script type="application/json" id="DATA">{"summary": [{"influencer_id": 1, "name": "김서연", "tier": "micro", "category": "스킨케어", "follower_count": 32000, "clicks": 800, "purchases": 165, "revenue": 4422000, "coupon_orders": 135, "cvr": 0.20625, "aov": 26800.0}, {"influencer_id": 6, "name": "한소희", "tier": "micro", "category": "스킨케어", "follower_count": 26000, "clicks": 520, "purchases": 42, "revenue": 746000, "coupon_orders": 34, "cvr": 0.08076923076923077, "aov": 17761.904761904763}, {"influencer_id": 3, "name": "박지수", "tier": "micro", "category": "스킨케어", "follower_count": 41000, "clicks": 650, "purchases": 40, "revenue": 704000, "coupon_orders": 37, "cvr": 0.06153846153846154, "aov": 17600.0}, {"influencer_id": 2, "name": "이하늘", "tier": "mid", "category": "메이크업", "follower_count": 88000, "clicks": 1400, "purchases": 62, "revenue": 1308000, "coupon_orders": 49, "cvr": 0.04428571428571428, "aov": 21096.774193548386}, {"influencer_id": 4, "name": "최유진", "tier": "mega", "category": "라이프스타일", "follower_count": 620000, "clicks": 5200, "purchases": 91, "revenue": 2448000, "coupon_orders": 75, "cvr": 0.0175, "aov": 26901.0989010989}, {"influencer_id": 5, "name": "정민아", "tier": "mid", "category": "메이크업", "follower_count": 150000, "clicks": 0, "purchases": 210, "revenue": 4334000, "coupon_orders": 210, "cvr": null, "aov": 20638.095238095237}], "totals": {"influencers": 6, "clicks": 8570, "purchases": 610, "revenue": 13962000, "cvr": 0.07117852975495916}, "detail": {"1": {"info": {"influencer_id": 1, "name": "김서연", "handle": "seoyeon.skin", "follower_count": 32000, "tier": "micro", "category": "스킨케어"}, "contents": [{"content_id": 1, "platform": "ig_story", "tracking_type": "both", "product_name": "수분 앰플 30ml", "coupon_code": "COS-SEOY-2824", "has_link": true, "steps": [{"stage": "click", "label": "클릭", "count": 800, "drop": null, "width": 100.0, "is_worst": false}, {"stage": "landing", "label": "랜딩", "count": 600, "drop": 0.25, "width": 75.0, "is_worst": false}, {"stage": "cart", "label": "장바구니", "count": 330, "drop": 0.44999999999999996, "width": 41.25, "is_worst": true}, {"stage": "checkout", "label": "결제시도", "count": 230, "drop": 0.303030303030303, "width": 28.749999999999996, "is_worst": false}, {"stage": "purchase", "label": "구매", "count": 165, "drop": 0.28260869565217395, "width": 20.625, "is_worst": false}], "orders": 165, "revenue": 4422000}]}, "6": {"info": {"influencer_id": 6, "name": "한소희", "handle": "sohee.care", "follower_count": 26000, "tier": "micro", "category": "스킨케어"}, "contents": [{"content_id": 6, "platform": "ig_story", "tracking_type": "both", "product_name": "립 틴트 세트", "coupon_code": "COS-SOHE-2275", "has_link": true, "steps": [{"stage": "click", "label": "클릭", "count": 520, "drop": null, "width": 100.0, "is_worst": false}, {"stage": "landing", "label": "랜딩", "count": 364, "drop": 0.30000000000000004, "width": 70.0, "is_worst": false}, {"stage": "cart", "label": "장바구니", "count": 218, "drop": 0.4010989010989011, "width": 41.92307692307693, "is_worst": false}, {"stage": "checkout", "label": "결제시도", "count": 65, "drop": 0.7018348623853211, "width": 12.5, "is_worst": true}, {"stage": "purchase", "label": "구매", "count": 42, "drop": 0.3538461538461538, "width": 8.076923076923077, "is_worst": false}], "orders": 42, "revenue": 746000}]}, "3": {"info": {"influencer_id": 3, "name": "박지수", "handle": "jisoo.glow", "follower_count": 41000, "tier": "micro", "category": "스킨케어"}, "contents": [{"content_id": 3, "platform": "yt_long", "tracking_type": "both", "product_name": "립 틴트 세트", "coupon_code": "COS-JISO-9540", "has_link": true, "steps": [{"stage": "click", "label": "클릭", "count": 650, "drop": null, "width": 100.0, "is_worst": false}, {"stage": "landing", "label": "랜딩", "count": 442, "drop": 0.31999999999999995, "width": 68.0, "is_worst": false}, {"stage": "cart", "label": "장바구니", "count": 123, "drop": 0.7217194570135747, "width": 18.923076923076923, "is_worst": true}, {"stage": "checkout", "label": "결제시도", "count": 67, "drop": 0.4552845528455285, "width": 10.307692307692308, "is_worst": false}, {"stage": "purchase", "label": "구매", "count": 40, "drop": 0.4029850746268657, "width": 6.153846153846154, "is_worst": false}], "orders": 40, "revenue": 704000}]}, "2": {"info": {"influencer_id": 2, "name": "이하늘", "handle": "haneul_beauty", "follower_count": 88000, "tier": "mid", "category": "메이크업"}, "contents": [{"content_id": 2, "platform": "ig_story", "tracking_type": "both", "product_name": "톤업 선크림 50ml", "coupon_code": "COS-HANE-3608", "has_link": true, "steps": [{"stage": "click", "label": "클릭", "count": 1400, "drop": null, "width": 100.0, "is_worst": false}, {"stage": "landing", "label": "랜딩", "count": 420, "drop": 0.7, "width": 30.0, "is_worst": true}, {"stage": "cart", "label": "장바구니", "count": 189, "drop": 0.55, "width": 13.5, "is_worst": false}, {"stage": "checkout", "label": "결제시도", "count": 113, "drop": 0.4021164021164021, "width": 8.071428571428571, "is_worst": false}, {"stage": "purchase", "label": "구매", "count": 62, "drop": 0.4513274336283186, "width": 4.428571428571428, "is_worst": false}], "orders": 62, "revenue": 1308000}]}, "4": {"info": {"influencer_id": 4, "name": "최유진", "handle": "yujin.daily", "follower_count": 620000, "tier": "mega", "category": "라이프스타일"}, "contents": [{"content_id": 4, "platform": "ig_story", "tracking_type": "both", "product_name": "수분 앰플 30ml", "coupon_code": "COS-YUJI-2876", "has_link": true, "steps": [{"stage": "click", "label": "클릭", "count": 5200, "drop": null, "width": 100.0, "is_worst": false}, {"stage": "landing", "label": "랜딩", "count": 2860, "drop": 0.44999999999999996, "width": 55.00000000000001, "is_worst": false}, {"stage": "cart", "label": "장바구니", "count": 915, "drop": 0.68006993006993, "width": 17.596153846153847, "is_worst": false}, {"stage": "checkout", "label": "결제시도", "count": 366, "drop": 0.6, "width": 7.038461538461538, "is_worst": false}, {"stage": "purchase", "label": "구매", "count": 91, "drop": 0.7513661202185793, "width": 1.7500000000000002, "is_worst": true}], "orders": 91, "revenue": 2448000}]}, "5": {"info": {"influencer_id": 5, "name": "정민아", "handle": "mina_shorts", "follower_count": 150000, "tier": "mid", "category": "메이크업"}, "contents": [{"content_id": 5, "platform": "yt_shorts", "tracking_type": "coupon", "product_name": "톤업 선크림 50ml", "coupon_code": "COS-MINA-1339", "has_link": false, "steps": [], "orders": 210, "revenue": 4334000}]}}, "stage_labels": {"click": "클릭", "landing": "랜딩", "cart": "장바구니", "checkout": "결제시도", "purchase": "구매"}}</script>
+<script>
+const DATA = JSON.parse(document.getElementById("DATA").textContent);
+const won = n => n==null ? "\u2014" : Math.round(n).toLocaleString("en-US");
+const pct = (x,d=1) => x==null ? "N/A" : (x*100).toFixed(d)+"%";
+const FV = ["--f1","--f2","--f3","--f4","--f5"];
+
+let state = {tier:"all", category:"all", sort:"cvr", dir:-1, sel:null};
+
+const tiles = DATA.totals;
+document.getElementById("tiles").innerHTML = [
+  ["인플루언서", won(tiles.influencers), ""],
+  ["총 클릭 (링크 트랙)", won(tiles.clicks), ""],
+  ["귀속 구매", won(tiles.purchases), ""],
+  ["귀속 매출", won(tiles.revenue), "<small> 원</small>"],
+].map(([k,v,s])=>`<div class="tile"><div class="k">${k}</div><div class="v">${v}${s}</div></div>`).join("");
+
+// filters
+const tiers = ["all","micro","mid","mega"];
+const cats = ["all", ...[...new Set(DATA.summary.map(s=>s.category))]];
+function renderFilters(){
+  const g = (label, key, opts, cur) => `<div class="fgroup"><span class="lbl">${label}</span>`+
+    opts.map(o=>`<button class="chip" data-k="${key}" data-v="${o}" aria-pressed="${cur===o}">${o==="all"?"전체":o}</button>`).join("")+`</div>`;
+  document.getElementById("filters").innerHTML = g("등급","tier",tiers,state.tier)+g("카테고리","category",cats,state.category);
+  document.querySelectorAll("#filters .chip").forEach(b=>b.onclick=()=>{
+    state[b.dataset.k]=b.dataset.v; state.sel=null; render();
+  });
+}
+
+const COLS = [
+  ["name","인플루언서",false],["tier","등급",false],["category","카테고리",false],
+  ["clicks","클릭",true],["purchases","구매",true],["cvr","CVR",true],
+  ["revenue","쿠폰 매출",true],["aov","AOV",true],
+];
+function renderHead(){
+  document.getElementById("thead").innerHTML = COLS.map(([k,l,num])=>{
+    const ar = state.sort===k ? `<span class="ar">${state.dir<0?"\u25bc":"\u25b2"}</span>` : "";
+    const sm = (k==="category") ? " hide-sm":"";
+    return `<th class="${num?"num":""}${sm}" data-k="${k}">${l}${ar}</th>`;
+  }).join("");
+  document.querySelectorAll("#thead th").forEach(th=>th.onclick=()=>{
+    const k=th.dataset.k;
+    if(state.sort===k) state.dir*=-1; else {state.sort=k; state.dir=(k==="name"||k==="category")?1:-1;}
+    render();
+  });
+}
+
+function rows(){
+  let r = DATA.summary.filter(s=>
+    (state.tier==="all"||s.tier===state.tier) &&
+    (state.category==="all"||s.category===state.category));
+  const k=state.sort;
+  r.sort((a,b)=>{
+    let x=a[k], y=b[k];
+    if(x==null) x=-Infinity; if(y==null) y=-Infinity;
+    if(typeof x==="string") return state.dir*x.localeCompare(y,"ko");
+    return state.dir*(x-y);
+  });
+  return r;
+}
+function renderTable(){
+  const r = rows();
+  const maxc = Math.max(...r.map(s=>s.cvr||0), 0.0001);
+  document.getElementById("tbody").innerHTML = r.map(s=>{
+    const cvr = s.cvr==null
+      ? `<span class="na" title="쇼츠 등 링크 불가 — 쿠폰 트랙(구매만)">쿠폰전용</span>`
+      : `<div class="barcell"><span class="cvr">${pct(s.cvr)}</span><span class="track"><span class="fill" style="width:${(s.cvr/maxc*100).toFixed(1)}%"></span></span></div>`;
+    return `<tr data-id="${s.influencer_id}" class="${state.sel===s.influencer_id?"sel":""}">
+      <td><span class="name">${s.name}<span class="go">퍼널 &rsaquo;</span></span></td>
+      <td><span class="tierchip tier-${s.tier}">${s.tier}</span></td>
+      <td class="hide-sm">${s.category}</td>
+      <td class="num">${s.clicks?won(s.clicks):"\u2014"}</td>
+      <td class="num">${won(s.purchases)}</td>
+      <td class="num">${cvr}</td>
+      <td class="num">${won(s.revenue)}</td>
+      <td class="num">${s.aov?won(s.aov):"\u2014"}</td>
+    </tr>`;
+  }).join("") || `<tr><td colspan="8" class="empty">조건에 맞는 인플루언서가 없습니다.</td></tr>`;
+  document.querySelectorAll("#tbody tr[data-id]").forEach(tr=>tr.onclick=()=>{
+    const id=+tr.dataset.id;
+    state.sel = state.sel===id ? null : id;
+    render();
+    if(state.sel){requestAnimationFrame(()=>document.getElementById("panel").scrollIntoView({behavior:"smooth",block:"nearest"}));}
+  });
+}
+
+function renderPanel(){
+  const p=document.getElementById("panel");
+  if(state.sel==null){p.innerHTML="";return;}
+  const d=DATA.detail[state.sel]; const inf=d.info;
+  const blocks=d.contents.map(c=>{
+    let body;
+    if(c.has_link){
+      const first=c.steps[0]?c.steps[0].count:0;
+      const rowsH=c.steps.map((st,i)=>{
+        const w = first?(st.count/first*100):0;
+        const meta = st.drop==null ? "시작"
+          : `${st.is_worst?"\u26a0 \uCD5C\uB300\uC774\uD0C8 ":""}이탈 ${pct(st.drop,0)}`;
+        return `<div class="frow">
+          <div class="fl">${st.label}</div>
+          <div class="ftrack"><div class="fbar" style="width:${w.toFixed(1)}%;background:var(${FV[i]})">${won(st.count)}</div></div>
+          <div class="fmeta ${st.is_worst?"worst":""}">${meta}</div></div>`;
+      }).join("");
+      body=`<div class="funnel">${rowsH}</div><p class="legend">단계 폭 = 클릭 대비 잔존 세션 비율 · 이탈%는 직전 단계 대비 감소율</p>`;
+    } else {
+      body=`<div class="couponcard">
+        <div><div class="k">쿠폰 사용 주문</div><div class="b">${won(c.orders)}</div></div>
+        <div><div class="k">쿠폰 매출</div><div class="b">${won(c.revenue)} 원</div></div>
+      </div><p class="legend">링크를 걸 수 없는 채널(${c.platform})이라 중간 퍼널은 관측 불가 — 쿠폰코드로 구매만 집계</p>`;
+    }
+    return `<div class="cblock"><div class="chead"><span class="pn">${c.product_name}</span>
+      <span class="plat">${c.platform}</span>${c.coupon_code?`<span class="code">${c.coupon_code}</span>`:""}</div>${body}</div>`;
+  }).join("");
+  p.innerHTML=`<div class="detail">
+    <div class="dhead">
+      <h3>${inf.name}</h3><span class="tierchip tier-${inf.tier}">${inf.tier}</span>
+      <button class="dclose" id="dclose">닫기 \u2715</button>
+    </div>
+    <p class="dmeta">@${inf.handle} · ${inf.category} · 팔로워 ${won(inf.follower_count)}</p>
+    ${blocks}
+  </div>`;
+  document.getElementById("dclose").onclick=()=>{state.sel=null;render();};
+}
+
+function render(){renderFilters();renderHead();renderTable();renderPanel();}
+render();
+</script>
