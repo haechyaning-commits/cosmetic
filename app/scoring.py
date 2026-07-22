@@ -31,6 +31,21 @@ def product_text(prod):
     ]))
 
 
+_TERM_STOP = {"도움", "주는", "먹는", "타먹", "관리", "필요", "종일", "하루"}
+
+
+def product_terms(prod):
+    """상품 텍스트에서 하이라이트용 핵심어 추출(중복 제거)."""
+    text = " ".join(filter(None, [
+        prod["name"], prod["ingredients"], prod["efficacy_description"], prod["usage_scenario"],
+    ]))
+    out = []
+    for w in re.findall(r"[가-힣]{2,}|[A-Za-z]{3,}", text):
+        if w not in out and w not in _TERM_STOP:
+            out.append(w)
+    return out[:20]
+
+
 def influencer_phrases(inf):
     phrases = []
     for kw in (inf["comment_keywords"] or "").split(","):
@@ -159,12 +174,12 @@ def match(product_id, conn, backend, weights=None, use_semantic=True):
             wsum = weights["w2"] + weights["w3"]
             final = (weights["w2"] * engagement + weights["w3"] * aud) / wsum if wsum else 0.0
 
-        # 매칭 근거: 인플루언서 구 중 상품과 유사도 상위 3
+        # 매칭 근거: 인플루언서 구 중 상품과 유사도 상위 3 (문구 + 유사도 점수)
         reasons = []
         if use_semantic:
             scored = [(p, norm_cos(cosine(pvec, phrase_vecs[p]))) for p in phrase_map[inf["influencer_id"]]]
             scored.sort(key=lambda x: x[1], reverse=True)
-            reasons = [p for p, _ in scored[:3]]
+            reasons = [{"text": p, "score": round(s, 3)} for p, s in scored[:3]]
 
         rows.append(dict(
             influencer_id=inf["influencer_id"], name=inf["name"], handle=inf["handle"],
@@ -176,4 +191,5 @@ def match(product_id, conn, backend, weights=None, use_semantic=True):
         ))
 
     rows.sort(key=lambda r: (not r["excluded"], r["final"]), reverse=True)
-    return dict(product=dict(prod), rows=rows, backend=backend.name, weights=weights)
+    return dict(product=dict(prod), product_terms=product_terms(prod),
+                rows=rows, backend=backend.name, weights=weights)

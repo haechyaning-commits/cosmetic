@@ -60,7 +60,7 @@
 </div>
 
 <div class="rank" id="rank"></div>
-<p class="legend" id="rank-legend">최종점수 = w1·의미 + w2·참여율 + w3·오디언스핏 (가중치는 합 1로 정규화). 정형 필터 제외 후보는 회색으로 하단 표시. 매칭 근거는 상품과 의미가 가장 가까운 인플루언서 콘텐츠/키워드입니다.</p>
+<p class="legend" id="rank-legend">최종점수 = w1·의미 + w2·참여율 + w3·오디언스핏 (가중치는 합 1로 정규화). 정형 필터 제외 후보는 회색으로 하단 표시. 매칭 근거 칩의 <mark class="hl">파란 하이라이트</mark>는 상품과 <b>실제로 겹치는 표현</b>, 끝의 숫자는 그 문구와 상품의 의미 유사도(100점 만점) — 하이라이트 없이 숫자만 높으면 <b>단어는 달라도 뜻이 통하는</b> 의미 매칭입니다.</p>
 
 <div id="compare" style="display:none"></div>
 
@@ -70,11 +70,21 @@
 <script>
 const ROWS = JSON.parse(document.getElementById("ROWS").textContent);
 const PRESETS = {{ presets_json|safe }};
+const PTERMS = {{ product_terms_json|safe }};
 let W = { {{ "w1: %.2f, w2: %.2f, w3: %.2f"|format(weights.w1, weights.w2, weights.w3) }} };
 let useSem = true;
 
 const $ = id => document.getElementById(id);
 const pctOf = x => Math.round(x*100);
+function escRe(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
+function esc(s){return s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+function hl(text){
+  let out=esc(text);
+  const terms=[...PTERMS].filter(t=>t.length>=2).sort((a,b)=>b.length-a.length);
+  if(terms.length){const re=new RegExp('('+terms.map(escRe).join('|')+')','g');out=out.replace(re,'<mark class="hl">$1</mark>');}
+  return out;
+}
+function reasonChip(x){return `<span class="rchip">${hl(x.text)}<span class="rsc">${Math.round(x.score*100)}</span></span>`;}
 
 function setSliders(){
   $("w1").value = Math.round(W.w1*100);
@@ -106,7 +116,7 @@ function render(){
   $("rank").innerHTML = rows.map(r=>{
     if(!r.excluded) n++;
     const reasons = (useSem && !r.excluded && r.reasons.length)
-      ? `<div class="reasons">${r.reasons.map(x=>`<span class="rchip">${x}</span>`).join("")}</div>` : "";
+      ? `<div class="reasons">${r.reasons.map(reasonChip).join("")}</div>` : "";
     const excl = r.excluded ? `<div class="excl">⛔ 정형 필터 제외 — ${r.filter_reasons.join(", ")}</div>` : "";
     const sub = r.excluded ? "" : `<div class="scores">
         <div class="finalscore"><span class="fs">${(r._f*100).toFixed(0)}</span><span class="fl">/ 100</span></div>

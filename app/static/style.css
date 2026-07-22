@@ -96,7 +96,9 @@ h1{font-size:24px;letter-spacing:-.02em;margin:0 0 6px;text-wrap:balance}
 .badge.niche{background:var(--surface-2)}
 .who .sub{font-size:12px;color:var(--muted);margin-top:1px}
 .reasons{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
-.rchip{font-size:11.5px;padding:2px 9px;border-radius:999px;background:var(--sem-soft);color:var(--ink);border:1px solid var(--border)}
+.rchip{font-size:11.5px;padding:2px 9px;border-radius:999px;background:var(--surface-2);color:var(--ink-2);border:1px solid var(--border);display:inline-flex;align-items:center;gap:5px}
+mark.hl{background:color-mix(in srgb,var(--sem) 26%,transparent);color:var(--ink);border-radius:3px;padding:0 2px;font-weight:600}
+.rsc{font-size:10px;font-weight:700;color:var(--sem);font-variant-numeric:tabular-nums;background:var(--sem-soft);border-radius:999px;padding:0 5px}
 .excl{font-size:12px;color:var(--critical);font-weight:600;margin-top:7px;display:flex;align-items:center;gap:6px}
 
 /* 스코어 파트 */
@@ -126,11 +128,11 @@ footer{margin-top:26px;color:var(--muted);font-size:12px;text-align:center}
 .tab{font-size:12.5px;padding:6px 12px;border-radius:8px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink-2);cursor:pointer;transition:.12s}
 .tab:hover{border-color:var(--accent);color:var(--ink)}
 .tab[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
-.cmp-head{display:grid;grid-template-columns:1fr 130px 1fr;align-items:center;font-weight:650;font-size:13px;margin-bottom:8px}
+.cmp-head{display:grid;grid-template-columns:1fr clamp(170px,30%,360px) 1fr;align-items:center;font-weight:650;font-size:13px;margin-bottom:8px}
 .cmp-head .r{text-align:right}
 .tagm{font-size:11px;font-weight:500;color:var(--muted);border:1px solid var(--line-strong);border-radius:999px;padding:1px 7px;margin-left:5px}
 .tagm.accent{color:var(--accent);border-color:var(--accent)}
-.cmp-body{position:relative;display:grid;grid-template-columns:1fr 130px 1fr;background:var(--surface);border:1px solid var(--border);border-radius:13px;box-shadow:var(--shadow);overflow:hidden}
+.cmp-body{position:relative;display:grid;grid-template-columns:1fr clamp(170px,30%,360px) 1fr;background:var(--surface);border:1px solid var(--border);border-radius:13px;box-shadow:var(--shadow);overflow:hidden}
 .cmp-col{display:flex;flex-direction:column}
 .cmp-row{height:52px;display:flex;align-items:center;gap:9px;padding:0 14px;border-bottom:1px solid var(--line)}
 .cmp-row:last-child{border-bottom:none}
@@ -138,12 +140,14 @@ footer{margin-top:26px;color:var(--muted);font-size:12px;text-align:center}
 .cmp-rk{font-weight:700;color:var(--muted);min-width:18px;text-align:center;font-variant-numeric:tabular-nums}
 .cmp-nm{font-weight:600;display:flex;align-items:center;gap:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cmp-col.right .cmp-nm{flex-direction:row-reverse}
-.cmp-mid{position:relative;border-left:1px solid var(--line);border-right:1px solid var(--line)}
+.cmp-mid{position:relative;background:color-mix(in srgb,var(--surface-2) 55%,transparent);border-left:1px solid var(--line);border-right:1px solid var(--line)}
 .cmp-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
-.cmp-svg .ln{fill:none;stroke-width:2;vector-effect:non-scaling-stroke;opacity:.6}
-.cmp-svg .ln.up{stroke:var(--aud);opacity:.85}
-.cmp-svg .ln.down{stroke:var(--eng);opacity:.85}
-.cmp-svg .ln.same{stroke:var(--line-strong)}
+.cmp-svg .ln{fill:none;stroke-width:3;vector-effect:non-scaling-stroke;stroke-linecap:round;opacity:.55}
+.cmp-svg .ln.up{stroke:var(--aud);opacity:1}
+.cmp-svg .ln.down{stroke:var(--eng);opacity:1}
+.cmp-svg .ln.same{stroke:var(--muted);opacity:.5}
+.cmp-dot{fill:var(--surface)}
+.cmp-dot.up{stroke:var(--aud)}.cmp-dot.down{stroke:var(--eng)}.cmp-dot.same{stroke:var(--muted)}
 .delta{font-size:11.5px;font-weight:700;font-variant-numeric:tabular-nums;padding:0 2px}
 .delta.up{color:var(--aud)}.delta.down{color:var(--eng)}.delta.same{color:var(--muted)}
 .cmp-row.up{background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--aud) 9%,transparent))}

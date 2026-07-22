@@ -59,6 +59,7 @@ def product_view(request: Request, product_id: int):
             "products": products,
             "product": result["product"],
             "rows_json": json.dumps(result["rows"], ensure_ascii=False),
+            "product_terms_json": json.dumps(result["product_terms"], ensure_ascii=False),
             "presets_json": json.dumps(scoring.PRESETS),
             "backend": result["backend"],
             "weights": scoring.DEFAULT_WEIGHTS,
