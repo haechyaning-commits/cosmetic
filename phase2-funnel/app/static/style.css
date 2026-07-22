@@ -1,0 +1,105 @@
+/* 팔레트: dataviz 레퍼런스 인스턴스(검증된 기본값) 기반.
+   단일 지표 비교 → 단일 블루. 퍼널 → 오디널 블루 램프. 최대 이탈 → status critical. */
+:root {
+  color-scheme: light;
+  --page:          #f9f9f7;
+  --surface:       #fcfcfb;
+  --text-primary:  #0b0b0b;
+  --text-secondary:#52514e;
+  --muted:         #898781;
+  --grid:          #e1e0d9;
+  --baseline:      #c3c2b7;
+  --border:        rgba(11,11,11,0.10);
+  --series-1:      #2a78d6;
+  --series-1-soft: #cde2fb;
+  /* 퍼널 오디널 램프(라이트: step250~650) */
+  --f1:#86b6ef; --f2:#5598e7; --f3:#2a78d6; --f4:#1c5cab; --f5:#104281;
+  --good:    #0ca30c;
+  --critical:#d03b3b;
+  --good-text:#006300;
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    color-scheme: dark;
+    --page:#0d0d0d; --surface:#1a1a19;
+    --text-primary:#ffffff; --text-secondary:#c3c2b7; --muted:#898781;
+    --grid:#2c2c2a; --baseline:#383835; --border:rgba(255,255,255,0.10);
+    --series-1:#3987e5; --series-1-soft:#184f95;
+    --f1:#6da7ec; --f2:#3987e5; --f3:#256abf; --f4:#184f95; --f5:#104281;
+    --good:#0ca30c; --critical:#d03b3b; --good-text:#0ca30c;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page:#0d0d0d; --surface:#1a1a19;
+  --text-primary:#ffffff; --text-secondary:#c3c2b7; --muted:#898781;
+  --grid:#2c2c2a; --baseline:#383835; --border:rgba(255,255,255,0.10);
+  --series-1:#3987e5; --series-1-soft:#184f95;
+  --f1:#6da7ec; --f2:#3987e5; --f3:#256abf; --f4:#184f95; --f5:#104281;
+  --good:#0ca30c; --critical:#d03b3b; --good-text:#0ca30c;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--page); color: var(--text-primary);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 14px; line-height: 1.5;
+}
+.wrap { max-width: 1080px; margin: 0 auto; padding: 32px 24px 64px; }
+a { color: var(--series-1); text-decoration: none; }
+a:hover { text-decoration: underline; }
+h1 { font-size: 22px; margin: 0 0 4px; }
+h2 { font-size: 16px; margin: 32px 0 12px; }
+.sub { color: var(--text-secondary); margin: 0 0 8px; }
+.crumb { color: var(--muted); font-size: 13px; margin-bottom: 16px; }
+
+/* stat tiles */
+.tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 20px; }
+.tile {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+  padding: 14px 16px;
+}
+.tile .label { color: var(--text-secondary); font-size: 12px; }
+.tile .value { font-size: 26px; font-weight: 650; margin-top: 4px; letter-spacing: -0.01em; }
+.tile .value small { font-size: 14px; font-weight: 500; color: var(--muted); }
+
+/* table */
+.card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+  overflow: hidden;
+}
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: 11px 14px; font-variant-numeric: tabular-nums; }
+th { color: var(--muted); font-weight: 600; font-size: 12px; border-bottom: 1px solid var(--grid); }
+tbody tr { border-bottom: 1px solid var(--grid); }
+tbody tr:last-child { border-bottom: none; }
+td.num, th.num { text-align: right; }
+.chip {
+  display: inline-block; font-size: 11px; padding: 1px 7px; border-radius: 999px;
+  border: 1px solid var(--border); color: var(--text-secondary); background: var(--page);
+}
+
+/* inline CVR bar */
+.barcell { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
+.bartrack { width: 90px; height: 8px; background: var(--series-1-soft); border-radius: 999px; overflow: hidden; }
+.barfill { height: 100%; background: var(--series-1); border-radius: 999px; }
+.cvrval { min-width: 46px; text-align: right; font-weight: 600; }
+.na { color: var(--muted); }
+
+/* funnel */
+.funnel { display: grid; gap: 6px; margin: 8px 0 4px; }
+.frow { display: grid; grid-template-columns: 72px 1fr 150px; align-items: center; gap: 10px; }
+.frow .fl { color: var(--text-secondary); font-size: 13px; white-space: nowrap; }
+.fbar-track { background: var(--page); border-radius: 6px; height: 26px; position: relative; }
+.fbar { height: 100%; border-radius: 6px; display: flex; align-items: center; padding-left: 10px;
+        color: #fff; font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.fmeta { font-size: 12px; color: var(--text-secondary); text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.fmeta.worst { color: var(--critical); font-weight: 700; }
+.tag-worst { color: var(--critical); font-weight: 700; }
+.legend { color: var(--muted); font-size: 12px; margin-top: 6px; }
+.couponcard { padding: 12px 14px; background: var(--page); border-radius: 8px; display: inline-flex; gap: 20px; }
+.couponcard b { font-size: 18px; }
+.content-block { border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 14px; background: var(--surface); }
+.content-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 10px; }
+.content-head .pn { font-weight: 650; }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; color: var(--text-secondary); }

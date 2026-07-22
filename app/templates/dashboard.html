@@ -1,54 +1,135 @@
 {% extends "base.html" %}
+{% block title %}{{ product.name }} · 매칭{% endblock %}
 {% block body %}
-<h1>인플루언서 시딩 퍼널</h1>
-<p class="sub">유통 채널과 무관하게, 시딩이 실제 구매로 이어진 성과를 인플루언서 단위로 비교합니다.</p>
+<p class="eyebrow">인플루언서 · 제품 매칭 스코어링</p>
+<h1>이 상품에 누구를 시딩해야 맞을까</h1>
+<p class="lede">정형 필터로 후보를 거른 뒤, 콘텐츠 텍스트의 <b>의미 유사도</b>로 순위화합니다. 카테고리 라벨이 달라도 의미가 겹치는 인접 니치 인플루언서를 찾아냅니다.</p>
+{% if backend == "hashing" %}
+<span class="backend-chip"><span class="dot warn"></span>임베딩: 오프라인 폴백(hashing) — 렉시컬 위주. API 키 연결 시 의미 매칭 정확도 향상</span>
+{% else %}
+<span class="backend-chip"><span class="dot"></span>임베딩 백엔드: {{ backend }}</span>
+{% endif %}
 
-<div class="tiles">
-  <div class="tile"><div class="label">인플루언서</div><div class="value">{{ totals.influencers }}</div></div>
-  <div class="tile"><div class="label">총 클릭(링크 트랙)</div><div class="value">{{ totals.clicks|won }}</div></div>
-  <div class="tile"><div class="label">귀속 구매</div><div class="value">{{ totals.purchases|won }}</div></div>
-  <div class="tile"><div class="label">귀속 매출</div><div class="value">{{ totals.revenue|won }}<small> 원</small></div></div>
+<div class="section-label">상품 선택</div>
+<div class="products">
+  {% for p in products %}
+  <a class="pcard {{ 'sel' if p.product_id == product.product_id else '' }}" href="/product/{{ p.product_id }}">
+    <div class="pn">{{ p.name }}</div><div class="pc">{{ p.category }}</div>
+  </a>
+  {% endfor %}
 </div>
 
-<h2>인플루언서 비교 <span class="chip">CVR = 구매 / 클릭</span></h2>
-<div class="card">
-  <table>
-    <thead>
-      <tr>
-        <th>인플루언서</th>
-        <th>등급</th>
-        <th>카테고리</th>
-        <th class="num">클릭</th>
-        <th class="num">구매</th>
-        <th class="num">CVR</th>
-        <th class="num">쿠폰 매출</th>
-        <th class="num">AOV</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for s in summary %}
-      <tr>
-        <td><a href="/influencer/{{ s.influencer_id }}">{{ s.name }}</a></td>
-        <td><span class="chip">{{ s.tier }}</span></td>
-        <td>{{ s.category }}</td>
-        <td class="num">{{ s.clicks|won if s.clicks else '—' }}</td>
-        <td class="num">{{ s.purchases|won }}</td>
-        <td class="num">
-          {% if s.cvr is not none %}
-          <div class="barcell">
-            <span class="cvrval">{{ s.cvr|pct }}</span>
-            <span class="bartrack"><span class="barfill" style="width: {{ (s.cvr / max_cvr * 100)|round(1) }}%"></span></span>
-          </div>
-          {% else %}
-          <span class="na" title="쇼츠 등 링크 불가 채널 — 쿠폰 트랙(구매만)">쿠폰전용</span>
-          {% endif %}
-        </td>
-        <td class="num">{{ s.revenue|won }}</td>
-        <td class="num">{{ s.aov|won if s.aov else '—' }}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+<div class="prodbox">
+  <h2>{{ product.name }}</h2>
+  <div class="meta">{{ product.category }} · {{ product.price|won }}원 · 타겟 {{ product.target_age_group }} / {{ product.target_gender }}</div>
+  <div class="kv">
+    <div><b>성분</b> {{ product.ingredients }}</div>
+    <div><b>효능</b> {{ product.efficacy_description }}</div>
+    <div><b>사용</b> {{ product.usage_scenario }}</div>
+  </div>
 </div>
-<p class="legend">CVR 막대는 표 내 최고값 기준 상대 길이. “쿠폰전용”은 릴스·쇼츠처럼 링크를 걸 수 없어 클릭이 없고 구매만 집계되는 콘텐츠입니다.</p>
+
+<div class="controls">
+  <div>
+    <div class="section-label" style="margin:0 0 7px">캠페인 프리셋</div>
+    <div class="presets">
+      <button class="btn" data-preset="conversion" aria-pressed="true">전환형 (콘텐츠↑)</button>
+      <button class="btn" data-preset="awareness">인지도형 (참여율↑)</button>
+    </div>
+  </div>
+  <div class="sliders" id="sliders">
+    <div class="slider">
+      <div class="lab"><span class="sw"><span class="swatch" style="background:var(--sem)"></span>의미 적합성 w1</span><span class="val" id="v1"></span></div>
+      <input type="range" id="w1" min="0" max="100" step="5">
+    </div>
+    <div class="slider">
+      <div class="lab"><span class="sw"><span class="swatch" style="background:var(--eng)"></span>참여율 w2</span><span class="val" id="v2"></span></div>
+      <input type="range" id="w2" min="0" max="100" step="5">
+    </div>
+    <div class="slider">
+      <div class="lab"><span class="sw"><span class="swatch" style="background:var(--aud)"></span>오디언스핏 w3</span><span class="val" id="v3"></span></div>
+      <input type="range" id="w3" min="0" max="100" step="5">
+    </div>
+  </div>
+  <label class="toggle"><input type="checkbox" id="semtoggle" checked>의미 매칭 사용 <span style="color:var(--muted)">(끄면 기존 툴 방식=정형만)</span></label>
+</div>
+
+<div class="rank" id="rank"></div>
+<p class="legend">최종점수 = w1·의미 + w2·참여율 + w3·오디언스핏 (가중치는 합 1로 정규화). 정형 필터 제외 후보는 회색으로 하단 표시. 매칭 근거는 상품과 의미가 가장 가까운 인플루언서 콘텐츠/키워드입니다.</p>
+
+<footer>인플루언서-제품 매칭 스코어링 — MVP</footer>
+
+<script type="application/json" id="ROWS">{{ rows_json|safe }}</script>
+<script>
+const ROWS = JSON.parse(document.getElementById("ROWS").textContent);
+const PRESETS = {{ presets_json|safe }};
+let W = { {{ "w1: %.2f, w2: %.2f, w3: %.2f"|format(weights.w1, weights.w2, weights.w3) }} };
+let useSem = true;
+
+const $ = id => document.getElementById(id);
+const pctOf = x => Math.round(x*100);
+
+function setSliders(){
+  $("w1").value = Math.round(W.w1*100);
+  $("w2").value = Math.round(W.w2*100);
+  $("w3").value = Math.round(W.w3*100);
+  $("v1").textContent = pctOf(W.w1)+"%";
+  $("v2").textContent = pctOf(W.w2)+"%";
+  $("v3").textContent = pctOf(W.w3)+"%";
+}
+function readSliders(){
+  let a=+$("w1").value, b=+$("w2").value, c=+$("w3").value;
+  let s=a+b+c; if(s===0){a=b=c=1;s=3;}
+  W={w1:a/s,w2:b/s,w3:c/s};
+  setSliders();
+}
+function finalOf(r){
+  if(useSem) return W.w1*r.semantic + W.w2*r.engagement + W.w3*r.audience_fit;
+  const s=W.w2+W.w3; return s? (W.w2*r.engagement + W.w3*r.audience_fit)/s : 0;
+}
+function subbar(label, cls, val){
+  return `<div class="subbar"><span class="sl">${label}</span>
+    <span class="track t-${cls}"><span class="f-${cls}" style="width:${(val*100).toFixed(0)}%"></span></span>
+    <span class="sv">${(val*100).toFixed(0)}</span></div>`;
+}
+function render(){
+  const rows = ROWS.map(r=>({...r, _f: r.excluded?-1:finalOf(r)}));
+  rows.sort((a,b)=> (a.excluded-b.excluded) || (b._f-a._f));
+  let n=0;
+  $("rank").innerHTML = rows.map(r=>{
+    if(!r.excluded) n++;
+    const reasons = (useSem && !r.excluded && r.reasons.length)
+      ? `<div class="reasons">${r.reasons.map(x=>`<span class="rchip">${x}</span>`).join("")}</div>` : "";
+    const excl = r.excluded ? `<div class="excl">⛔ 정형 필터 제외 — ${r.filter_reasons.join(", ")}</div>` : "";
+    const sub = r.excluded ? "" : `<div class="scores">
+        <div class="finalscore"><span class="fs">${(r._f*100).toFixed(0)}</span><span class="fl">/ 100</span></div>
+        ${useSem?subbar("의미","sem",r.semantic):""}
+        ${subbar("참여","eng",r.engagement)}
+        ${subbar("타겟","aud",r.audience_fit)}
+      </div>`;
+    return `<div class="card ${r.excluded?'excluded':''}">
+      <div class="rankno">${r.excluded?'—':n}</div>
+      <div class="who">
+        <div class="nm">${r.name}<span class="badge niche">${r.niche_category}</span><span class="badge">${r.tier}</span></div>
+        <div class="sub">@${r.handle} · 팔로워 ${Number(r.follower_count).toLocaleString("en-US")} · 참여율 ${(r.engagement_rate*100).toFixed(1)}%</div>
+        ${reasons}${excl}
+      </div>
+      ${sub}
+    </div>`;
+  }).join("");
+}
+function setPreset(name){
+  W = {...PRESETS[name]};
+  document.querySelectorAll(".presets .btn").forEach(b=>b.setAttribute("aria-pressed", b.dataset.preset===name));
+  setSliders(); render();
+}
+document.querySelectorAll(".presets .btn").forEach(b=>b.onclick=()=>setPreset(b.dataset.preset));
+["w1","w2","w3"].forEach(id=>$(id).addEventListener("input",()=>{
+  document.querySelectorAll(".presets .btn").forEach(b=>b.setAttribute("aria-pressed","false"));
+  readSliders(); render();
+}));
+$("semtoggle").addEventListener("change",e=>{useSem=e.target.checked; render();});
+
+setSliders(); render();
+</script>
 {% endblock %}

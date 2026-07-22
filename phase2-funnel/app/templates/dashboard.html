@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>인플루언서 시딩 퍼널</h1>
+<p class="sub">유통 채널과 무관하게, 시딩이 실제 구매로 이어진 성과를 인플루언서 단위로 비교합니다.</p>
+
+<div class="tiles">
+  <div class="tile"><div class="label">인플루언서</div><div class="value">{{ totals.influencers }}</div></div>
+  <div class="tile"><div class="label">총 클릭(링크 트랙)</div><div class="value">{{ totals.clicks|won }}</div></div>
+  <div class="tile"><div class="label">귀속 구매</div><div class="value">{{ totals.purchases|won }}</div></div>
+  <div class="tile"><div class="label">귀속 매출</div><div class="value">{{ totals.revenue|won }}<small> 원</small></div></div>
+</div>
+
+<h2>인플루언서 비교 <span class="chip">CVR = 구매 / 클릭</span></h2>
+<div class="card">
+  <table>
+    <thead>
+      <tr>
+        <th>인플루언서</th>
+        <th>등급</th>
+        <th>카테고리</th>
+        <th class="num">클릭</th>
+        <th class="num">구매</th>
+        <th class="num">CVR</th>
+        <th class="num">쿠폰 매출</th>
+        <th class="num">AOV</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in summary %}
+      <tr>
+        <td><a href="/influencer/{{ s.influencer_id }}">{{ s.name }}</a></td>
+        <td><span class="chip">{{ s.tier }}</span></td>
+        <td>{{ s.category }}</td>
+        <td class="num">{{ s.clicks|won if s.clicks else '—' }}</td>
+        <td class="num">{{ s.purchases|won }}</td>
+        <td class="num">
+          {% if s.cvr is not none %}
+          <div class="barcell">
+            <span class="cvrval">{{ s.cvr|pct }}</span>
+            <span class="bartrack"><span class="barfill" style="width: {{ (s.cvr / max_cvr * 100)|round(1) }}%"></span></span>
+          </div>
+          {% else %}
+          <span class="na" title="쇼츠 등 링크 불가 채널 — 쿠폰 트랙(구매만)">쿠폰전용</span>
+          {% endif %}
+        </td>
+        <td class="num">{{ s.revenue|won }}</td>
+        <td class="num">{{ s.aov|won if s.aov else '—' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<p class="legend">CVR 막대는 표 내 최고값 기준 상대 길이. “쿠폰전용”은 릴스·쇼츠처럼 링크를 걸 수 없어 클릭이 없고 구매만 집계되는 콘텐츠입니다.</p>
+{% endblock %}

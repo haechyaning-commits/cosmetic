@@ -1,22 +1,11 @@
-"""DB 연결 및 스키마.
+"""DB 연결 및 스키마 (매칭 스코어링).
 
-MVP는 SQLite로 시작하되, 스키마는 PostgreSQL로 무리 없이 옮길 수 있게
-표준 SQL 위주로 작성한다(자동증가 PK와 타입만 이관 시 조정).
+SQLite로 시작하되 PostgreSQL 이관을 고려한 표준 SQL 위주.
 """
 import os
 import sqlite3
 
-DB_PATH = os.environ.get("COSMETIC_DB", os.path.join(os.path.dirname(__file__), "..", "cosmetic.db"))
-
-# 퍼널 단계 순서 (링크 트랙). 대시보드/집계에서 공통 참조.
-FUNNEL_STAGES = ["click", "landing", "cart", "checkout", "purchase"]
-STAGE_LABELS = {
-    "click": "클릭",
-    "landing": "랜딩",
-    "cart": "장바구니",
-    "checkout": "결제시도",
-    "purchase": "구매",
-}
+DB_PATH = os.environ.get("MATCH_DB", os.path.join(os.path.dirname(__file__), "..", "matching.db"))
 
 
 def get_conn():
@@ -28,57 +17,51 @@ def get_conn():
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS influencers (
-    influencer_id   INTEGER PRIMARY KEY,
-    name            TEXT NOT NULL,
-    handle          TEXT,
-    follower_count  INTEGER,
-    tier            TEXT CHECK (tier IN ('mega','mid','micro')),
-    category        TEXT
+    influencer_id       INTEGER PRIMARY KEY,
+    name                TEXT NOT NULL,
+    handle              TEXT,
+    follower_count      INTEGER,
+    tier                TEXT,               -- nano/micro/mid/mega
+    niche_category      TEXT,               -- 라벨상 니치 (건강/스킨케어/메이크업 ...)
+    recent_captions     TEXT,               -- 최근 콘텐츠 캡션 모음
+    comment_keywords    TEXT,               -- 댓글에서 반복되는 관심사 키워드
+    engagement_rate     REAL,               -- 0~1
+    avg_sponsorship_price INTEGER,          -- 평균 협찬 단가(KRW)
+    audience_age_group  TEXT,               -- 예: "20-34"
+    audience_gender_ratio TEXT,             -- 예: "F72/M28"
+    recent_sponsor_brands TEXT              -- 최근 협찬 브랜드(콤마구분)
 );
 
 CREATE TABLE IF NOT EXISTS products (
-    product_id      INTEGER PRIMARY KEY,
-    name            TEXT NOT NULL,
-    price           INTEGER,
-    channel         TEXT,           -- 자사몰/스마트스토어/올리브영/쿠팡
-    bundle_option   TEXT
+    product_id          INTEGER PRIMARY KEY,
+    name                TEXT NOT NULL,
+    category            TEXT,
+    price               INTEGER,
+    ingredients         TEXT,
+    efficacy_description TEXT,
+    usage_scenario      TEXT,
+    target_age_group    TEXT,               -- 예: "20-39"
+    target_gender       TEXT,               -- F/M/A(all)
+    competitor_brands   TEXT                -- 경쟁 브랜드(콤마구분)
 );
 
-CREATE TABLE IF NOT EXISTS contents (
-    content_id      INTEGER PRIMARY KEY,
-    influencer_id   INTEGER NOT NULL REFERENCES influencers(influencer_id),
-    product_id      INTEGER NOT NULL REFERENCES products(product_id),
-    platform        TEXT,           -- ig_reels/ig_story/yt_long/yt_shorts
-    tracking_type   TEXT CHECK (tracking_type IN ('coupon','link','both')),
-    coupon_code     TEXT UNIQUE,
-    landing_url     TEXT,
-    utm_content     TEXT,
-    reported_views  INTEGER,
-    upload_date     TEXT
+CREATE TABLE IF NOT EXISTS match_results (
+    match_id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    influencer_id       INTEGER REFERENCES influencers(influencer_id),
+    product_id          INTEGER REFERENCES products(product_id),
+    semantic_score      REAL,
+    engagement_score    REAL,
+    audience_fit_score  REAL,
+    final_score         REAL,
+    created_at          TEXT
 );
 
-CREATE TABLE IF NOT EXISTS orders (
-    order_id        INTEGER PRIMARY KEY,
-    session_id      TEXT,
-    product_id      INTEGER REFERENCES products(product_id),
-    amount          INTEGER,
-    coupon_code     TEXT,
-    ts              TEXT
+CREATE TABLE IF NOT EXISTS embedding_cache (
+    backend             TEXT,
+    text_hash           TEXT,
+    vector              TEXT,               -- JSON 직렬화된 float 리스트
+    PRIMARY KEY (backend, text_hash)
 );
-
-CREATE TABLE IF NOT EXISTS events (
-    event_id        INTEGER PRIMARY KEY,
-    content_id      INTEGER NOT NULL REFERENCES contents(content_id),
-    session_id      TEXT,
-    event_type      TEXT CHECK (event_type IN ('impression','click','landing','cart','checkout','purchase')),
-    order_id        INTEGER REFERENCES orders(order_id),
-    ts              TEXT
-);
-
-CREATE INDEX IF NOT EXISTS idx_events_content ON events(content_id);
-CREATE INDEX IF NOT EXISTS idx_events_type ON events(event_type);
-CREATE INDEX IF NOT EXISTS idx_orders_coupon ON orders(coupon_code);
-CREATE INDEX IF NOT EXISTS idx_contents_influencer ON contents(influencer_id);
 """
 
 
@@ -93,4 +76,4 @@ def init_db(conn=None):
 
 if __name__ == "__main__":
     init_db()
-    print(f"initialized schema at {os.path.abspath(DB_PATH)}")
+    print(f"initialized matching schema at {os.path.abspath(DB_PATH)}")
